@@ -14,6 +14,7 @@ public class MainMenu extends JFrame implements ActionListener {
 
     
         JFrame frame = new JFrame("");
+        Font fontStyle = FontLoader.load("./Assets/Whipsnapper W05 Black.ttf",102f);
         Font fontStyle2 = FontLoader.load("./Assets/Whipsnapper W05 Black.ttf",52f);
         Font fontStyle4 = FontLoader.load("./Assets/Whipsnapper W05 Black.ttf",78f);
         Font fontStyle3 = FontLoader.load("./Assets/Whipsnapper W05 Black.ttf", 86f);
@@ -27,46 +28,27 @@ public class MainMenu extends JFrame implements ActionListener {
         secondLabel.setIcon(secondBg);
         panel = new JPanel();
         panel.setLayout(new BorderLayout());
+        
         begin = new JButton("Start");
         begin.setFont(fontStyle3); 
         begin.setBounds(405, 800,495,115);
-        begin.setOpaque(false);
-        begin.setContentAreaFilled(false);
-        //begin.setBorderPainted(false);
-        begin.setFocusPainted(false);
-        begin.setForeground(Color.WHITE);
-        begin.addActionListener(this);
+        styleButton(begin);
 
         loadGame = new JButton("Load game"); 
         loadGame.setFont(fontStyle4);
         loadGame.setBounds(1011, 800,495,115);
-        loadGame.setOpaque(false);
-        loadGame.setContentAreaFilled(false);
-        //loadGame.setBorderPainted(false);
-        loadGame.setFocusPainted(false);
-        loadGame.setForeground(Color.WHITE);
-        loadGame.addActionListener(this);
+        styleButton(loadGame);
 
 
         twoPlayers = new JButton("2 PLAYERS");
         twoPlayers.setFont(fontStyle2);
         twoPlayers.setBounds(550, 907,365,85);
-        twoPlayers.setOpaque(false);
-        twoPlayers.setContentAreaFilled(false);
-        twoPlayers.setBorderPainted(false);
-        twoPlayers.setFocusPainted(false);
-        twoPlayers.setForeground(Color.WHITE);
-        twoPlayers.addActionListener(this);
+        styleButton(twoPlayers);
 
         fourPlayers = new JButton("4 PLAYERS");
         fourPlayers.setFont(fontStyle2);
         fourPlayers.setBounds(1000, 907,365,85);
-        fourPlayers.setOpaque(false);
-        fourPlayers.setContentAreaFilled(false);
-        fourPlayers.setBorderPainted(false);
-        fourPlayers.setFocusPainted(false);
-        fourPlayers.setForeground(Color.WHITE);
-        fourPlayers.addActionListener(this);
+        styleButton(fourPlayers);
 
         panel.add(firstLabel);
         firstLabel.add(begin);
@@ -79,6 +61,14 @@ public class MainMenu extends JFrame implements ActionListener {
 		frame.setVisible(true);
         frame.setSize(1920,1080);
 
+    }
+    private void styleButton (JButton b){
+        b.setOpaque(false);
+        b.setContentAreaFilled(false);
+        b.setBorderPainted(false);
+        b.setFocusPainted(false);
+        b.setForeground(Color.WHITE);
+        b.addActionListener(this);
     }
 
 
