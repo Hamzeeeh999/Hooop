@@ -3,82 +3,117 @@ import javax.swing.*;
 
 public class ScreenScaler {
 
-    // You can change this if your design was built for a different reference size
     private static final Dimension BASE_RESOLUTION = new Dimension(1920, 1080);
 
-    /**
-     * Scales the given JFrame and all its components to fit the user's screen.
-     * Works best with null (absolute) layouts.
-     */
     public static void scaleFrame(JFrame frame) {
         if (frame == null) return;
 
-        // Get current screen size
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
         double scaleX = screenSize.getWidth() / BASE_RESOLUTION.getWidth();
         double scaleY = screenSize.getHeight() / BASE_RESOLUTION.getHeight();
 
-        // Scale contents
         scaleComponent(frame.getContentPane(), scaleX, scaleY);
         scaleFont(frame.getContentPane(), Math.min(scaleX, scaleY));
 
-        // Resize the frame itself
         int newWidth = (int) (frame.getWidth() * scaleX);
         int newHeight = (int) (frame.getHeight() * scaleY);
         frame.setSize(newWidth, newHeight);
+
+        frame.revalidate();
+        frame.repaint();
     }
 
-    /** Recursively scales all components’ bounds */
     private static void scaleComponent(Component comp, double scaleX, double scaleY) {
-    if (comp == null) return;
+        if (comp == null) return;
 
-    // If container, recurse through children
-    if (comp instanceof Container container) {
-        LayoutManager layout = container.getLayout();
+        if (comp instanceof Container container) {
+            LayoutManager layout = container.getLayout();
 
-        // Scale bounds for components with null layout
-        if (layout == null) {
-            int newX = (int) (comp.getX() * scaleX);
-            int newY = (int) (comp.getY() * scaleY);
-            int newW = (int) (comp.getWidth() * scaleX);
-            int newH = (int) (comp.getHeight() * scaleY);
-            comp.setBounds(newX, newY, newW, newH);
-        } else {
-            // Even if layout is not null (like BorderLayout),
-            // we should still resize the container itself.
-            int newW = (int) (comp.getWidth() * scaleX);
-            int newH = (int) (comp.getHeight() * scaleY);
-            comp.setPreferredSize(new Dimension(newW, newH));
-        }
+            if (layout == null) {
+                int newX = (int) (comp.getX() * scaleX);
+                int newY = (int) (comp.getY() * scaleY);
+                int newW = (int) (comp.getWidth() * scaleX);
+                int newH = (int) (comp.getHeight() * scaleY);
+                comp.setBounds(newX, newY, newW, newH);
+            } else {
+                int newW = (int) (comp.getWidth() * scaleX);
+                int newH = (int) (comp.getHeight() * scaleY);
+                comp.setPreferredSize(new Dimension(newW, newH));
+            }
 
-        // Now recursively scale all child components
-        for (Component child : container.getComponents()) {
-            scaleComponent(child, scaleX, scaleY);
-        }
-    }
-
-    // For JLabel with ImageIcon (background scaling)
-    if (comp instanceof JLabel lbl) {
-        Icon icon = lbl.getIcon();
-        if (icon instanceof ImageIcon imgIcon) {
-            int w = (int) (lbl.getWidth());
-            int h = (int) (lbl.getHeight());
-            if (w > 0 && h > 0) {
-                Image scaledImg = imgIcon.getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH);
-                lbl.setIcon(new ImageIcon(scaledImg));
+            for (Component child : container.getComponents()) {
+                scaleComponent(child, scaleX, scaleY);
             }
         }
+
+        // Scale JLabel background images
+        if (comp instanceof JLabel lbl) {
+            Icon icon = lbl.getIcon();
+            if (icon instanceof ImageIcon imgIcon) {
+                int w = lbl.getWidth();
+                int h = lbl.getHeight();
+                if (w > 0 && h > 0) {
+                    Image scaledImg = imgIcon.getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH);
+                    lbl.setIcon(new ImageIcon(scaledImg));
+                }
+            }
+        }
+
+        // Scale JButton icons (Frogs, Leaves, Bridges, ActionCards)
+        if (comp instanceof JButton btn) {
+            Icon icon = btn.getIcon();
+            if (icon instanceof ImageIcon imgIcon) {
+                int w = btn.getWidth();
+                int h = btn.getHeight();
+                if (w > 0 && h > 0) {
+                    Image scaledImg = imgIcon.getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH);
+                    btn.setIcon(new ImageIcon(scaledImg));
+                }
+            }
+        }
+
+        // Special handling for JTextField, JTextArea, JComboBox (keep your existing logic)
+        if (comp instanceof JTextField txtField) {
+            scaleTextField(txtField, scaleX, scaleY);
+        } else if (comp instanceof JTextArea txtArea) {
+            scaleTextArea(txtArea, scaleX, scaleY);
+        } else if (comp instanceof JComboBox<?> comboBox) {
+            Font f = comboBox.getFont();
+            if (f != null)
+                comboBox.setFont(f.deriveFont((float) (f.getSize2D() * Math.min(scaleX, scaleY))));
+            int newW = (int) (comboBox.getWidth() * scaleX);
+            int newH = (int) (comboBox.getHeight() * scaleY);
+            comboBox.setBounds((int) (comboBox.getX() * scaleX), (int) (comboBox.getY() * scaleY), newW, newH);
+        }
     }
-}
 
-    
+    private static void scaleTextField(JTextField txtField, double scaleX, double scaleY) {
+        int newW = (int) (txtField.getWidth() * scaleX);
+        int newH = (int) (txtField.getHeight() * scaleY);
+        txtField.setBounds((int) (txtField.getX() * scaleX), (int) (txtField.getY() * scaleY), newW, newH);
+        Font f = txtField.getFont();
+        if (f != null) {
+            float newSize = (float) (f.getSize2D() * Math.min(scaleX, scaleY));
+            txtField.setFont(f.deriveFont(newSize));
+        }
+    }
 
-    /** Recursively scales all fonts */
+    private static void scaleTextArea(JTextArea txtArea, double scaleX, double scaleY) {
+        int newW = (int) (txtArea.getWidth() * scaleX);
+        int newH = (int) (txtArea.getHeight() * scaleY);
+        txtArea.setBounds((int) (txtArea.getX() * scaleX), (int) (txtArea.getY() * scaleY), newW, newH);
+        Font f = txtArea.getFont();
+        if (f != null) {
+            float newSize = (float) (f.getSize2D() * Math.min(scaleX, scaleY));
+            txtArea.setFont(f.deriveFont(newSize));
+        }
+    }
+
     private static void scaleFont(Component comp, double scale) {
         Font f = comp.getFont();
         if (f != null) {
-            float newSize = (float) (f.getSize2D() * scale);
+            float newSize = (float) (f.getSize2D() * scale*1.05);
             comp.setFont(f.deriveFont(newSize));
         }
 
@@ -87,7 +122,5 @@ public class ScreenScaler {
                 scaleFont(child, scale);
             }
         }
-        
     }
-    
 }

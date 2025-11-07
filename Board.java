@@ -9,7 +9,7 @@ public class Board extends JFrame implements ActionListener {
     public String player1, player2, player3, player4, playerColor;
     private ImageIcon hooop, leafsBg,baseBg;
     private int leafCount = 1, playerCount;
-    private String[] playerNames,playerColors = {"Blue", "Yellow","Red","Purple"},playerColors2 = {"Blue","Red"};
+    private String[] playerNames,playerColors = {"Blue", "Yellow","Red","Purple"};
     private JButton selectedButton = null, moveFrog, placeBridge, actionCard;
     private Font fontStyle1, fontStyle2, fontStyle3;
     private static int currentIndex = 0;
@@ -37,9 +37,7 @@ public class Board extends JFrame implements ActionListener {
         fontStyle1 = FontLoader.load("./Assets/Whipsnapper W05 Black.ttf",40f);
         fontStyle2 = FontLoader.load("./Assets/Whipsnapper W05 Black.ttf",52f);
         fontStyle3 = FontLoader.load("./Assets/Whipsnapper W05 Black.ttf", 86f);
-        // Implement the turn and make it switch once any player is done with their move.
 
-        // Image Imports
         turnDisplay = new JTextArea("It's " + turn +"'s Turn ");
         turnDisplay.setEditable(false);
         turnDisplay.setFont(fontStyle1);
@@ -54,7 +52,6 @@ public class Board extends JFrame implements ActionListener {
 
         ImageIcon gameBg = new ImageIcon("./Assets/Main-Menu-5.jpg");
         
-
         if(playerCount==2){
             baseBg = new ImageIcon("./Assets/Main-Menu-5-4.png");
         }
@@ -69,11 +66,9 @@ public class Board extends JFrame implements ActionListener {
             leafsBg = new ImageIcon("./Assets/Main-Menu-5-3.png");
         }
 
-
-        // Background Labels
-        backgroundLabel = new JLabel(gameBg);
-        baseLabel = new JLabel(baseBg);
-        leafsLabel = new JLabel(leafsBg);
+        backgroundLabel = new ScaledImageLabel(gameBg.getImage());
+        baseLabel = new ScaledImageLabel(baseBg.getImage());
+        leafsLabel = new ScaledImageLabel(leafsBg.getImage());
 
         moveFrog = new JButton("Move a Frog");
         moveFrog.setBounds(25,100,150,50);
@@ -149,7 +144,7 @@ public class Board extends JFrame implements ActionListener {
                 frog.addActionListener(this);
                 frog.setActionCommand("yellowFrog" + i);
                 yellowFrogs[i] = frog;
-                //frog.disbaled();
+
                 pane.add(frog, Integer.valueOf(5));
             }
             for (int i=0;i<3;i++) {
@@ -158,7 +153,6 @@ public class Board extends JFrame implements ActionListener {
                 frog.setBounds(437, 200+100*i,72, 77);
                 frog.addActionListener(this);
                 purpleFrogs[i] = frog;
-                //frog.disbaled();
                 frog.setActionCommand("purpleFrog" + i);
                 pane.add(frog, Integer.valueOf(5));
             }
@@ -175,20 +169,16 @@ public class Board extends JFrame implements ActionListener {
                 }
             }
         }
-        // for loop for the red frogs - player 3
+
         for (int i=0;i<3;i++) {
             Frog frog = new Frog("Red");
             frog.setPlayer3();
             frog.setBounds(1041+100*i, 26,72, 77);
             frog.addActionListener(this);
             redFrogs[i] = frog;
-            //frog.disbaled();
             frog.setActionCommand("redFrog" + i);
             pane.add(frog, Integer.valueOf(5));
         }
-        // for loop for the purple frogs - player 
-
-        // for loop for the first and third player's Action cards
         for(int j=0;j<2;j++){
             for(int i=0;i<4;i++){
                 ActionCard card = new ActionCard();
@@ -200,14 +190,8 @@ public class Board extends JFrame implements ActionListener {
                 card.nextCard();
             }
         }
-        // for loop for the second and fourth player's Action cards
-        
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        int screenWidth = screenSize.width;
-        int screenHeight = screenSize.height;
 
         
-        // adding the backgrounds and images to the layered panels and the last part is their layer number, stacked layers.
         pane.add(backgroundLabel, Integer.valueOf(0));
         pane.add(turnDisplay, Integer.valueOf(7));
         pane.add(baseLabel, Integer.valueOf(1));
@@ -216,15 +200,15 @@ public class Board extends JFrame implements ActionListener {
         pane.add(placeBridge, Integer.valueOf(8));
         pane.add(actionCard, Integer.valueOf(8));
         frame.add(pane);
-        
-        // fonts defined
-        //Font fontStyle2 = new Font("WhipsnapperW05-Black", Font.BOLD, 52);
-        //Font fontStyle3 = new Font("WhipsnapperW05-Black", Font.BOLD, 86);
+
+        frame.setSize(1920,1080);
+        ScreenScaler.scaleFrame(frame);
+        frame.getContentPane().revalidate();
+        frame.getContentPane().repaint();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setUndecorated(true);
 		frame.setResizable(false);
 		frame.setVisible(true);
-        frame.setSize(screenWidth, screenHeight);
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
     }
     private int cx(JComponent c) { 
@@ -238,13 +222,14 @@ public class Board extends JFrame implements ActionListener {
         if (playerCount ==2){
             if (currentIndex == 2){
             currentIndex = 0;
-            playerColor = playerColors2[currentIndex];
+
         }
         }
         else if (currentIndex == 4){
             currentIndex = 0;
-            playerColor = playerColors[currentIndex];
+            
         }
+        playerColor = playerColors[currentIndex];
         turn = playerNames[currentIndex];
         turnDisplay.setText("It's " + turn +"'s Turn ");
     }
@@ -328,7 +313,7 @@ public class Board extends JFrame implements ActionListener {
             turnSwitch();
         }
     }
-    if (!(src instanceof Leaf && selectedFrog == null)) {
+    if (!(src instanceof Leaf && selectedFrog == null && selectedFrog.getPlayerColor() == playerColor)) {
         System.out.println("It's not your turn!");
         selectedFrog.unHighlightFrog();
     }
@@ -344,79 +329,3 @@ public class Board extends JFrame implements ActionListener {
     }
     
 }
-
-
-/*
-if (selected instanceof Leaf && selectedButton == null) {
-                ((Leaf) selected).actionPerformed(e);
-            }
-        if (selected instanceof Bridge && selectedButton == null) {
-                ((Bridge) selected).actionPerformed(e);
-            }
-        if (selected instanceof ActionCard && selectedButton == null) {
-                ((ActionCard) selected).actionPerformed(e);
-            }
-
-if (selected instanceof ActionCard) {
-
-            ((ActionCard) selected).doneCard();
-            //System.out.println(((ActionCard) selected).getCardName());
-
-        }
-            
-        
-if (selectedButton == null) {
-
-            selectedButton = (Frog) selected;
-            ((Frog) selectedButton).highlightFrog();
-            
-        }
-        else {
-             Object targetLeaf = selected;
-             if(selectedButton != targetLeaf){
-                System.out.println("Moving frog to new position");
-                ((Frog) selectedButton).moveFrog(((JButton) targetLeaf).getX() + ((JButton) targetLeaf).getWidth()/2, ((JButton) targetLeaf).getY() + ((JButton) targetLeaf).getHeight()/2);
-                selectedButton.setOpaque(false);
-                selectedButton = null;
-             }
-        }
-             
-        if (selected.equals(moveFrog) && turn == players[0]){
-            for(int i=0;i<3;i++){
-                blueFrogs[i].setEnabled(true);
-            }
-        }
-        if (selected.equals(moveFrog) && turn == players[1]){
-            for(int i=0;i<3;i++){
-                yellowFrogs[i].setEnabled(true);
-            }
-        }
-        if (selected.equals(moveFrog) && turn == players[2]){
-            for(int i=0;i<3;i++){
-                redFrogs[i].setEnabled(true);
-            }
-        }
-        if (selected.equals(moveFrog) && turn == players[3]){
-            for(int i=0;i<3;i++){
-                purpleFrogs[i].setEnabled(true);
-            }
-        }
-
-        if (selectedButton == null) {
-
-            selectedButton = (Frog) selected;
-            ((Frog) selectedButton).highlightFrog();
-        }
-        else {
-            if(selected instanceof Leaf) {
-                Leaf targetLeaf = (Leaf) selected;
-                if(selectedButton != targetLeaf && ((Leaf) targetLeaf).isOccupied() == false){
-                    ((Frog) selectedButton).moveFrog(((Leaf) targetLeaf).getX() + ((Leaf) targetLeaf).getWidth()/2, ((Leaf) targetLeaf).getY() + ((Leaf) targetLeaf).getHeight()/2);
-                    ((Leaf)targetLeaf).setOccupied();
-                    ((Frog)selectedButton).unHighlightFrog();
-                    turnSwitch();
-                    selectedButton =null;
-                }
-            }
-        }
-*/

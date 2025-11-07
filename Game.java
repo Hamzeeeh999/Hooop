@@ -27,8 +27,7 @@ public class Game extends JFrame implements ActionListener{
             gameBg = new ImageIcon("./Assets/Main-Menu-3.jpg");
         }
 
-        backgroundLabel = new JLabel();
-        backgroundLabel.setIcon(gameBg);
+        backgroundLabel = new ScaledImageLabel(gameBg.getImage());
         name1 = new JTextField("");
         name1.setFont(fontStyle2);
         name1.setBounds(200, 470,575,80);
@@ -84,18 +83,16 @@ public class Game extends JFrame implements ActionListener{
         panel.add(backgroundLabel);
         backgroundLabel.add(startGame);
         frame.add(panel);
-        
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        int screenWidth = screenSize.width;
-        int screenHeight = screenSize.height;
 
 
-
+        frame.setSize(1920,1080);
+        ScreenScaler.scaleFrame(frame);
+        frame.getContentPane().revalidate();
+        frame.getContentPane().repaint();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setUndecorated(true);
 	    frame.setResizable(false);
 	    frame.setVisible(true);
-        frame.setSize(screenWidth, screenHeight);
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
     
     

@@ -48,9 +48,17 @@ public class MainMenu extends JFrame implements ActionListener {
         fourPlayers.setBounds(1000, 907,365,85);
         styleButton(fourPlayers);
 
+        secondLabel.add(twoPlayers);
+        secondLabel.add(fourPlayers);
+        secondLabel.setVisible(false);
+        panel.add(secondLabel);
         panel.add(firstLabel);
         firstLabel.add(begin);
         firstLabel.add(loadGame);
+        secondLabel.add(twoPlayers);
+        secondLabel.add(fourPlayers);
+        secondLabel.setVisible(false);
+        
         frame.add(panel);
     
         frame.setSize(1920,1080);
@@ -79,23 +87,24 @@ public class MainMenu extends JFrame implements ActionListener {
         Object clicked = e.getSource();
 
         if (clicked.equals(begin)){
-            panel.add(secondLabel);
             firstLabel.setVisible(false);
-            secondLabel.add(twoPlayers);
-            secondLabel.add(fourPlayers);
-
-            if (e.getSource()==twoPlayers) {
+            secondLabel.setVisible(true);
+            panel.add(secondLabel);
+            
+        }
+        if (clicked.equals(twoPlayers)) {
                 int numberOfPlayers = 2;
+                System.out.println("2222");
                 Game demo = new Game(numberOfPlayers);
             // Add logic for 2 players
-            } 
-            else if (e.getSource()==fourPlayers) {
+        } 
+        else if (clicked.equals(fourPlayers)) {
                 int numberOfPlayers = 4;
                 Game demo = new Game(numberOfPlayers);
 
-            }
-
         }
+
+        
 
         if (clicked.equals(loadGame)){
 
