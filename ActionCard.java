@@ -1,0 +1,60 @@
+import javax.swing.*;
+
+public class ActionCard extends JButton{
+
+    private static int counter = 0 ;
+    private String cardName = "Jumping Frog";
+
+    public ActionCard(){
+        super(new ImageIcon("./Assets/Jumping-Frog.png"));
+        setOpaque(false);
+        setContentAreaFilled(false);
+        setBorderPainted(false);
+        setFocusPainted(false);
+        setBorder(null);
+        //setEnabled(false);
+
+    }
+    public void nextCard(){
+        counter++;
+        if(counter==2){
+            setSecondCard();
+            cardName = "Two Jumps";
+        }
+        else if(counter==3){
+            setThirdCard();
+            cardName = "Two Bridges";
+        }
+        else if(counter==4){
+            setFourthCard();
+            cardName = "No Bridge";
+            counter = 0;
+        }
+        
+
+        
+    }
+    public void setSecondCard(){
+        this.setIcon(new ImageIcon("./Assets/Two-Jumps.png"));
+    }
+    public void setThirdCard(){
+        this.setIcon(new ImageIcon("./Assets/Two-Bridges.png"));
+    }
+    public void setFourthCard(){
+        this.setIcon(new ImageIcon("./Assets/No-Bridge.png"));
+    }
+    public void doneCard(){
+        this.setIcon(new ImageIcon("./Assets/Hooop!.png"));
+    }
+
+    public int getCounter(){
+        return counter;
+    }   
+    public String getCardName(){
+        return cardName;
+    }
+
+
+
+
+}
