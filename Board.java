@@ -124,7 +124,7 @@ public class Board extends JFrame implements ActionListener {
                 pane.add(bridge, Integer.valueOf(4));
             }
         }
-        // for loop to add the blue frogs and number them for player 1
+
         for (int i=0;i<3;i++) {
             Frog frog = new Frog("Blue");
             frog.setBounds(1041+100*i, 983,72, 77);
@@ -134,8 +134,7 @@ public class Board extends JFrame implements ActionListener {
             //frog.disbaled();
             pane.add(frog, Integer.valueOf(5));
         }
-        
-        // for loop for the yellow frogs - player 2
+
         if (playerCount>2){
             for (int i=0;i<3;i++) {
                 Frog frog = new Frog("Yellow");
@@ -284,7 +283,6 @@ public class Board extends JFrame implements ActionListener {
     if (src instanceof Leaf && selectedFrog != null && selectedFrog.getPlayerColor() == playerColor) {
         Leaf targetLeaf = (Leaf) src;
         if (!targetLeaf.isOccupied()) {
-            // find the closest leaf the frog is on
             Leaf currentLeaf = null;
             for (Leaf leaf : leaves) {
                 int frogCenterX = selectedFrog.getX() + selectedFrog.getWidth() / 2;
