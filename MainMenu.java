@@ -19,16 +19,14 @@ public class MainMenu extends JFrame implements ActionListener {
         Font fontStyle4 = FontLoader.load("./Assets/Whipsnapper W05 Black.ttf",78f);
         Font fontStyle3 = FontLoader.load("./Assets/Whipsnapper W05 Black.ttf", 86f);
         ImageIcon firstBg = new ImageIcon("./Assets/Main-Menu.jpg");
-        firstLabel = new JLabel();
-        firstLabel.setIcon(firstBg);
-
-
         ImageIcon secondBg = new ImageIcon("./Assets/Main-Menu-2.jpg");
-        secondLabel = new JLabel();
-        secondLabel.setIcon(secondBg);
+        firstLabel = new ScaledImageLabel(firstBg.getImage());
+        secondLabel = new ScaledImageLabel(secondBg.getImage());
+
+
         panel = new JPanel();
         panel.setLayout(new BorderLayout());
-        
+
         begin = new JButton("Start");
         begin.setFont(fontStyle3); 
         begin.setBounds(405, 800,495,115);
@@ -55,11 +53,15 @@ public class MainMenu extends JFrame implements ActionListener {
         firstLabel.add(loadGame);
         frame.add(panel);
     
+        frame.setSize(1920,1080);
+        ScreenScaler.scaleFrame(frame);
+        frame.getContentPane().revalidate();
+        frame.getContentPane().repaint();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setUndecorated(true);
 		frame.setResizable(false);
 		frame.setVisible(true);
-        frame.setSize(1920,1080);
+        
 
     }
     private void styleButton (JButton b){
@@ -101,5 +103,8 @@ public class MainMenu extends JFrame implements ActionListener {
         }
     
 
+    }
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(MainMenu::new);
     }
 }
