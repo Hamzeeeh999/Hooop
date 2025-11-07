@@ -4,6 +4,8 @@ import javax.swing.*;
 
 public class Board extends JFrame implements ActionListener {
 
+    //this is my message
+
     private JLayeredPane pane;
     private JLabel backgroundLabel, leafsLabel, baseLabel;
     public String player1, player2, player3, player4, playerColor;
