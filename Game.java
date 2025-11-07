@@ -70,13 +70,7 @@ public class Game extends JFrame implements ActionListener{
         startGame = new JButton("Start Game");
         startGame.setFont(fontStyle3);
         startGame.setBounds(660, 840,595,135);
-        startGame.setOpaque(false);
-        startGame.setContentAreaFilled(false);
-        startGame.setBorderPainted(false);
-        startGame.setFocusPainted(false);
-        startGame.setForeground(Color.WHITE);
-        startGame.addActionListener(this);
-
+        styleButton(startGame);
         panel = new JPanel();
         panel.setLayout(new BorderLayout());
 
@@ -97,6 +91,14 @@ public class Game extends JFrame implements ActionListener{
     
     
 }
+private void styleButton (JButton b){
+        b.setOpaque(false);
+        b.setContentAreaFilled(false);
+        b.setBorderPainted(false);
+        b.setFocusPainted(false);
+        b.setForeground(Color.WHITE);
+        b.addActionListener(this);
+    }
 public void actionPerformed(ActionEvent e) {
 
         Player p1 = new Player(name1.getText());
