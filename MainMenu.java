@@ -14,7 +14,6 @@ public class MainMenu extends JFrame implements ActionListener {
 
     
         JFrame frame = new JFrame("");
-        Font fontStyle = FontLoader.load("./Assets/Whipsnapper W05 Black.ttf",102f);
         Font fontStyle2 = FontLoader.load("./Assets/Whipsnapper W05 Black.ttf",52f);
         Font fontStyle4 = FontLoader.load("./Assets/Whipsnapper W05 Black.ttf",78f);
         Font fontStyle3 = FontLoader.load("./Assets/Whipsnapper W05 Black.ttf", 86f);
