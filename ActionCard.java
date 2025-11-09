@@ -3,7 +3,7 @@ import javax.swing.*;
 public class ActionCard extends JButton{
 
     private static int counter = 0 ;
-    private String cardName = "Jumping Frog";
+    private String cardName = "Parachute";
 
     public ActionCard(){
         super(new ImageIcon("./Assets/Jumping-Frog.png"));
@@ -19,15 +19,15 @@ public class ActionCard extends JButton{
         counter++;
         if(counter==2){
             setSecondCard();
-            cardName = "Two Jumps";
+            cardName = "Extra Jump";
         }
         else if(counter==3){
             setThirdCard();
-            cardName = "Two Bridges";
+            cardName = "Extra Bridge";
         }
         else if(counter==4){
             setFourthCard();
-            cardName = "No Bridge";
+            cardName = "Bridge Removal";
             counter = 0;
         }
         
