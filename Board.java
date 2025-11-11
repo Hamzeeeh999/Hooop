@@ -21,6 +21,7 @@ public class Board extends JFrame implements ActionListener {
     private java.util.List<Bridge> bridges = new java.util.ArrayList<>();
     private java.util.List<Leaf> leaves = new java.util.ArrayList<>();
     private boolean isHorizontal(JComponent c) { return c.getWidth() > c.getHeight(); }
+    private boolean parachuteMode = false;
 
     public Board(String[] players, int playerCount) {
 
@@ -309,12 +310,21 @@ public class Board extends JFrame implements ActionListener {
             }
 
             selectedFrog = null;
+            parachuteMode = false;
             turnSwitch();
         }
     }
+
     if (!(src instanceof Leaf && selectedFrog == null && selectedFrog.getPlayerColor() == playerColor)) {
         System.out.println("It's not your turn!");
         selectedFrog.unHighlightFrog();
+    }
+
+    if (src instanceof ActionCard && selectedFrog != null && selectedFrog.getPlayerColor() == playerColor){
+        ActionCard targetCard = (ActionCard) src;
+        if(targetCard.getName() == "Parachute"){
+            parachuteMode = true;
+        }
     }
 }
 
