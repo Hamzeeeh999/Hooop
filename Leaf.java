@@ -8,9 +8,9 @@ public class Leaf extends JButton implements ActionListener{
         super(new ImageIcon("./Assets/Leaf.png"));
         setOpaque(false);
         setContentAreaFilled(false);
-        //setBorderPainted(false);
-        //setFocusPainted(false);
-        //setBorder(null);
+        setBorderPainted(false);
+        setFocusPainted(false);
+        setBorder(null);
 
     }
     
