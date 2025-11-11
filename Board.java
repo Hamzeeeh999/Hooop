@@ -11,7 +11,7 @@ public class Board extends JFrame implements ActionListener {
     private ImageIcon hooop, leafsBg,baseBg;
     private int leafCount = 1, playerCount;
     private String[] playerNames,playerColors = {"Blue", "Yellow","Red","Purple"};
-    private JButton selectedButton = null, moveFrog, placeBridge, actionCard;
+    private JButton selectedButton = null;
     private Font fontStyle1, fontStyle2, fontStyle3;
     private static int currentIndex = 0;
     private JTextArea turnDisplay;
@@ -72,16 +72,6 @@ public class Board extends JFrame implements ActionListener {
         baseLabel = new ScaledImageLabel(baseBg.getImage());
         leafsLabel = new ScaledImageLabel(leafsBg.getImage());
 
-        moveFrog = new JButton("Move a Frog");
-        moveFrog.setBounds(25,100,150,50);
-        moveFrog.addActionListener(this);
-        placeBridge = new JButton("Place a Bridge");
-        placeBridge.setBounds(25,150,150,50);
-        placeBridge.addActionListener(this);
-        actionCard = new JButton("Play an Action Card");
-        actionCard.setBounds(25,200,150,50);
-        actionCard.addActionListener(this);
-
         // Enabling the drag and drop functionality
         //final Point[] mouseOffset = {null};
 
@@ -131,9 +121,9 @@ public class Board extends JFrame implements ActionListener {
             Frog frog = new Frog("Blue");
             frog.setBounds(1041+100*i, 983,72, 77);
             frog.addActionListener(this);
+            frog.setEnabled(true);
             frog.setActionCommand("blueFrog" + i);
             blueFrogs[i] = frog;
-            //frog.disbaled();
             pane.add(frog, Integer.valueOf(5));
         }
 
@@ -197,9 +187,6 @@ public class Board extends JFrame implements ActionListener {
         pane.add(turnDisplay, Integer.valueOf(7));
         pane.add(baseLabel, Integer.valueOf(1));
         pane.add(leafsLabel, Integer.valueOf(6));
-        pane.add(moveFrog, Integer.valueOf(8));
-        pane.add(placeBridge, Integer.valueOf(8));
-        pane.add(actionCard, Integer.valueOf(8));
         frame.add(pane);
 
         frame.setSize(1920,1080);
@@ -218,6 +205,33 @@ public class Board extends JFrame implements ActionListener {
     private int cy(JComponent c) { 
         return c.getY() + c.getHeight()/2; 
     }
+    static int counter = 0;
+    public void switchFrogs(){
+
+        for (int i=0;i<3;i++){
+            
+            if (counter == 0){
+                yellowFrogs[i].setEnabled(true);
+                blueFrogs[i].setEnabled(false);
+            }
+            if (counter == 1){
+                redFrogs[i].setEnabled(true);
+                yellowFrogs[i].setEnabled(false);
+            }
+            if (counter == 2){
+                redFrogs[i].setEnabled(false);
+                purpleFrogs[i].setEnabled(true);
+            }
+            if (counter == 3){
+                purpleFrogs[i].setEnabled(false);
+                blueFrogs[i].setEnabled(true);
+            }
+        }
+        counter++;
+        if(counter == 4){
+            counter=0;
+        }
+    }
     public void turnSwitch() {
         currentIndex++;
         if (playerCount ==2){
@@ -232,8 +246,11 @@ public class Board extends JFrame implements ActionListener {
         }
         playerColor = playerColors[currentIndex];
         turn = playerNames[currentIndex];
+        switchFrogs();
         turnDisplay.setText("It's " + turn +"'s Turn ");
     }
+
+    
     
 
     private void removeBridgeBetween(Leaf from, Leaf to) {
@@ -282,7 +299,7 @@ public class Board extends JFrame implements ActionListener {
         return;
     }
 
-    if (src instanceof Leaf && selectedFrog != null && selectedFrog.getPlayerColor() == playerColor) {
+    if (src instanceof Leaf && selectedFrog != null && selectedFrog.getPlayerColor().equals(playerColor)) {
         Leaf targetLeaf = (Leaf) src;
         if (!targetLeaf.isOccupied()) {
             Leaf currentLeaf = null;
@@ -312,18 +329,7 @@ public class Board extends JFrame implements ActionListener {
             selectedFrog = null;
             parachuteMode = false;
             turnSwitch();
-        }
-    }
 
-    if (!(src instanceof Leaf && selectedFrog == null && selectedFrog.getPlayerColor() == playerColor)) {
-        System.out.println("It's not your turn!");
-        selectedFrog.unHighlightFrog();
-    }
-
-    if (src instanceof ActionCard && selectedFrog != null && selectedFrog.getPlayerColor() == playerColor){
-        ActionCard targetCard = (ActionCard) src;
-        if(targetCard.getName() == "Parachute"){
-            parachuteMode = true;
         }
     }
 }

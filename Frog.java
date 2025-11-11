@@ -6,12 +6,14 @@ public class Frog extends JButton {
     Boolean highlighted = false;
     public Frog(String playerColor){
         super(new ImageIcon("./Assets/Blue-Frog.png"));
+        this.setDisabledIcon(new ImageIcon("./Assets/Blue-Frog.png"));
         this.playerColor = playerColor;
         setOpaque(false);
         setContentAreaFilled(false);
         setBorderPainted(false);
         setFocusPainted(false);
         setBorder(null);
+        setEnabled(false);
         //setDisabledIcon(new ImageIcon("Leaf.png"));
 
     }
@@ -32,12 +34,15 @@ public class Frog extends JButton {
     }
     public void setPlayer2(){
         this.setIcon(new ImageIcon("./Assets/Yellow-Frog.png"));
+        this.setDisabledIcon(new ImageIcon("./Assets/Yellow-Frog.png"));
     }
     public void setPlayer3(){
         this.setIcon(new ImageIcon("./Assets/Red-Frog.png"));
+        this.setDisabledIcon(new ImageIcon("./Assets/Red-Frog.png"));
     }
     public void setPlayer4(){
         this.setIcon(new ImageIcon("./Assets/Purple-Frog.png"));
+        this.setDisabledIcon(new ImageIcon("./Assets/Purple-Frog.png"));
     }
     public void highlightFrog(){
         setOpaque(true);
