@@ -11,6 +11,7 @@ public class Game extends JFrame implements ActionListener{
     private JTextField name1, name2, name3, name4;
     private ImageIcon gameBg;
     private int NumberOfPlayers;
+    private String player1Name, player2Name, player3Name, player4Name;
 
     public Game(int numberOfPlayers) {
         this.NumberOfPlayers = numberOfPlayers;
@@ -101,12 +102,38 @@ private void styleButton (JButton b){
     }
 public void actionPerformed(ActionEvent e) {
 
-        Player p1 = new Player(name1.getText());
-        Player p2 = new Player(name2.getText());
+        if (name1.getText().isEmpty()){
+            player1Name = "Player 1";
+        }
+        else{
+            player1Name = name1.getText();
+        }
+        Player p1 = new Player(player1Name);
+        
+        if (name2.getText().isEmpty()){
+            player2Name = "Player 2";
+        }
+        else{
+            player2Name = name1.getText();
+        }
+        Player p2 = new Player(player2Name);
 
     if (NumberOfPlayers >2){
-        Player p3 = new Player(name3.getText());
-        Player p4 = new Player(name4.getText());
+        if (name3.getText().isEmpty()){
+            player3Name = "Player 3";
+        }
+        else{
+            player3Name = name3.getText();
+        }
+        Player p3 = new Player(player3Name);
+
+        if (name4.getText().isEmpty()){
+            player4Name = "Player 4";
+        }
+        else{
+            player4Name = name4.getText();
+        }
+        Player p4 = new Player(player4Name);
     }
         if (e.getSource()==startGame) {
             // Start the game with the selected number of players

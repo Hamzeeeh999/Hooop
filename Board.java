@@ -253,52 +253,36 @@ public class Board extends JFrame implements ActionListener {
     private int cy(JComponent c) { 
         return c.getY() + c.getHeight()/2; 
     }
-    static int counter = 0;
-    public void switchFrogs(){
 
-        if (playerCount ==4){
-            for (int i=0;i<3;i++){
-            
-            if (counter == 0){
-                yellowFrogs[i].setEnabled(true);
-                blueFrogs[i].setEnabled(false);
-            }
-            if (counter == 1){
-                redFrogs[i].setEnabled(true);
-                yellowFrogs[i].setEnabled(false);
-            }
-            if (counter == 2){
-                redFrogs[i].setEnabled(false);
-                purpleFrogs[i].setEnabled(true);
-            }
-            if (counter == 3){
-                purpleFrogs[i].setEnabled(false);
-                blueFrogs[i].setEnabled(true);
-            }
+public void switchFrogs() {
+    if (playerCount == 2) {
+            for (int i = 0; i < 3; i++) {
+        blueFrogs[i].setEnabled(false);
+        redFrogs[i].setEnabled(false);
+    }
+        if (currentIndex == 0) {
+            for (int i = 0; i < 3; i++) blueFrogs[i].setEnabled(true);
+        } else if (currentIndex == 1) {
+            for (int i = 0; i < 3; i++) redFrogs[i].setEnabled(true);
         }
-        }
-        else{
-            
-            for (int i=0;i<2;i++){
-            
-            if (counter == 0){
-                redFrogs[i].setEnabled(true);
-                blueFrogs[i].setEnabled(false);
-            }
-            if (counter == 1){
-                blueFrogs[i].setEnabled(true);
-                redFrogs[i].setEnabled(false);
-            }
-        }
-        }
-        counter++;
-        if(counter == 4){
-            counter=0;
-        }
-        if(counter ==2){
-            counter = 0;
+    } 
+    else if (playerCount == 4) {
+            for (int i = 0; i < 3; i++) {
+        blueFrogs[i].setEnabled(false);
+        redFrogs[i].setEnabled(false);
+        yellowFrogs[i].setEnabled(false);
+        purpleFrogs[i].setEnabled(false);
+    }
+        switch (currentIndex) {
+            case 0 -> { for (int i = 0; i < 3; i++) blueFrogs[i].setEnabled(true); }
+            case 1 -> { for (int i = 0; i < 3; i++) yellowFrogs[i].setEnabled(true); }
+            case 2 -> { for (int i = 0; i < 3; i++) redFrogs[i].setEnabled(true); }
+            case 3 -> { for (int i = 0; i < 3; i++) purpleFrogs[i].setEnabled(true); }
         }
     }
+
+        
+}
     public void turnSwitch() {
         currentIndex++;
         if (playerCount ==2){
@@ -353,7 +337,6 @@ public class Board extends JFrame implements ActionListener {
 
         if (playerCount ==4){
             playerColor = playerColors[currentIndex];
-            System.out.println(playerColor);
         }
         else{
             playerColor = playerColors2[currentIndex];
@@ -370,6 +353,7 @@ public class Board extends JFrame implements ActionListener {
 
     int removedHorBridgesCounter;
     int removedVerBridgesCounter;
+    static int removedBridges;
 
     private void removeBridgeBetween(Leaf from, Leaf to) {
     int fx = cx(from), fy = cy(from);
@@ -389,14 +373,16 @@ public class Board extends JFrame implements ActionListener {
                 b.setVisible(false);
                 removedHorBridges[removedHorBridgesCounter] =b;
                 removedHorBridgesCounter++;
+                removedBridges++;
                 b.setEnabled(false);
                 return;
             }
         } else {
             if (Math.abs(bx - midX) <= TOL && Math.abs(by - midY) <= TOL) {
                 b.setVisible(false);
-                removedVerBridges[removedVerBridgesCounter] =b;
+                removedVerBridges[removedVerBridgesCounter]=b;
                 removedVerBridgesCounter++;
+                removedBridges++;
                 b.setEnabled(false);
                 return;
             }
@@ -412,7 +398,6 @@ private boolean hasBridgeBetween(Leaf from, Leaf to) {
     int midX = (fx + tx) / 2;
     int midY = (fy + ty) / 2;
 
-    // Slightly increase tolerance based on your 173–170 grid spacing
     final int TOL = 60;
 
     for (Bridge b : bridges) {
@@ -422,11 +407,9 @@ private boolean hasBridgeBetween(Leaf from, Leaf to) {
         int by = cy(b);
 
         if (isHorizontal(b)) {
-            // Bridges connect horizontally aligned leaves (same row)
             if (Math.abs(fy - ty) < 60 && Math.abs(bx - midX) < TOL && Math.abs(by - midY) < TOL)
                 return true;
         } else {
-            // Bridges connect vertically aligned leaves (same column)
             if (Math.abs(fx - tx) < 60 && Math.abs(bx - midX) < TOL && Math.abs(by - midY) < TOL)
                 return true;
         }
@@ -436,7 +419,7 @@ private boolean hasBridgeBetween(Leaf from, Leaf to) {
 }
 
 
-
+int bridgesPlaces;
 @Override
 public void actionPerformed(ActionEvent e) {
     Object src = e.getSource();
@@ -456,6 +439,7 @@ public void actionPerformed(ActionEvent e) {
     }
 
 
+    
     if (src instanceof Leaf && selectedFrog != null && selectedFrog.getPlayerColor().equals(playerColor)) {
         Leaf targetLeaf = (Leaf) src;
         if (selectedFrog.isOnLeaf()){
@@ -572,8 +556,13 @@ public void actionPerformed(ActionEvent e) {
     if (src instanceof ActionCard ){
         selectedCard = (ActionCard) src;
 
+        if (removedBridges < 2){
+            System.out.println("There's not enough bridges to place");
+            selectedCard = null;
+        }
 
-        if (selectedCard.getCardName() == "Extra Bridge" && selectedCard.getPlayerName().equals(turn) && removedHorBridgesCounter!= 0 || removedVerBridgesCounter!= 0){
+
+        if (selectedCard!= null && selectedCard.getCardName() == "Extra Bridge" && selectedCard.getPlayerName().equals(turn) && removedHorBridgesCounter!= 0 || removedVerBridgesCounter!= 0){
             for(int i= 0; i<removedHorBridgesCounter;i++){
                 if (removedHorBridges[i] != null){
                     removedHorBridges[i].setEnabled(true);
@@ -595,6 +584,8 @@ public void actionPerformed(ActionEvent e) {
         }
     if (command.equals("Removed Horizontal Bridge")){
         ((Bridge)src).placeHorBridge();
+        bridgesPlaces++;
+
 
         for(int i= 0; i<42;i++){
             if (((Bridge)src) == removedHorBridges[i]){
@@ -602,7 +593,8 @@ public void actionPerformed(ActionEvent e) {
                 break;
             }
         }
-        for(int i= 0; i<42;i++){
+        if (bridgesPlaces ==2){
+            for(int i= 0; i<42;i++){
             if (removedHorBridges[i]!= null){
                 removedHorBridges[i].setVisible(false);
                 removedHorBridges[i].setEnabled(false);
@@ -615,9 +607,17 @@ public void actionPerformed(ActionEvent e) {
             }
         }
         turnSwitch();
+        if (bridgesPlaces == 2){
+            bridgesPlaces = 0;
+        }
+        selectedCard.doneCard();
+            
+        }
+        
     }
     else if (command.equals("Removed Vertical Bridge")){
         ((Bridge)src).placeVerBridge();
+        bridgesPlaces++;
 
         for(int i= 0; i<42;i++){
             if (((Bridge)src) == removedVerBridges[i]){
@@ -625,6 +625,8 @@ public void actionPerformed(ActionEvent e) {
                 break;
             }
         }
+        if (bridgesPlaces ==2){
+        
         for(int i= 0; i<42;i++){
             if (removedVerBridges[i]!= null){
                 removedVerBridges[i].setVisible(false);
@@ -638,7 +640,12 @@ public void actionPerformed(ActionEvent e) {
             }
         }
         turnSwitch();
+        if (bridgesPlaces == 2){
+            bridgesPlaces = 0;
+        }
+        selectedCard.doneCard();
     }
+}
 
 }
     
