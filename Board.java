@@ -10,7 +10,7 @@ public class Board extends JFrame implements ActionListener {
     public String player1, player2, player3, player4, playerColor, playerTurn;
     private ImageIcon hooop, leafsBg,baseBg;
     private int leafCount = 1, playerCount;
-    private String[] playerNames,playerColors = {"Blue", "Yellow","Red","Purple"}, baseLeaves = {"leaf 23","leaf 15","leaf 3","leaf 11"};
+    private String[] playerNames,playerColors = {"Blue", "Yellow","Red","Purple"},playerColors2 = {"Blue","Red"}, baseLeaves = {"leaf 23","leaf 15","leaf 3","leaf 11"}, baseLeaves2 = {"leaf 23","leaf 3"};
     private JButton selectedButton = null;
     private Font fontStyle1, fontStyle2, fontStyle3;
     private static int currentIndex = 0;
@@ -32,10 +32,6 @@ public class Board extends JFrame implements ActionListener {
         JFrame frame = new JFrame();
         playerNames = new String[playerCount];
         playerNames = players;
-        for (int i=0; i<playerCount;i++)
-        {
-            System.out.println(playerNames[i]);
-        }
         this.playerCount = playerCount;
         turn = players[0];
         playerColor = playerColors[currentIndex];
@@ -205,7 +201,8 @@ public class Board extends JFrame implements ActionListener {
                 player1Cards[i]=card;
                 card.nextCard();
             }
-        for(int i=0;i<4;i++){
+        if (playerCount ==4){
+                for(int i=0;i<4;i++){
                 ActionCard card = new ActionCard(playerNames[2]);
                 card.setBounds(592 + 82*i,980-958,72, 88);
                 pane.add(card, Integer.valueOf(5));
@@ -216,6 +213,22 @@ public class Board extends JFrame implements ActionListener {
                 card.nextCard();
                 card.setEnabled(false);
             }
+        }
+
+        else{
+            for(int i=0;i<4;i++){
+                ActionCard card = new ActionCard(playerNames[1]);
+                card.setBounds(592 + 82*i,980-958,72, 88);
+                pane.add(card, Integer.valueOf(5));
+                card.setFocusPainted(false);
+                card.addActionListener(this);
+                card.setActionCommand("ActionCard" + i);
+                player3Cards[i]=card;
+                card.nextCard();
+                card.setEnabled(false);
+            }
+        }
+        
 
         
         pane.add(backgroundLabel, Integer.valueOf(0));
@@ -243,7 +256,8 @@ public class Board extends JFrame implements ActionListener {
     static int counter = 0;
     public void switchFrogs(){
 
-        for (int i=0;i<3;i++){
+        if (playerCount ==4){
+            for (int i=0;i<3;i++){
             
             if (counter == 0){
                 yellowFrogs[i].setEnabled(true);
@@ -262,9 +276,27 @@ public class Board extends JFrame implements ActionListener {
                 blueFrogs[i].setEnabled(true);
             }
         }
+        }
+        else{
+            
+            for (int i=0;i<2;i++){
+            
+            if (counter == 0){
+                redFrogs[i].setEnabled(true);
+                blueFrogs[i].setEnabled(false);
+            }
+            if (counter == 1){
+                blueFrogs[i].setEnabled(true);
+                redFrogs[i].setEnabled(false);
+            }
+        }
+        }
         counter++;
         if(counter == 4){
             counter=0;
+        }
+        if(counter ==2){
+            counter = 0;
         }
     }
     public void turnSwitch() {
@@ -272,18 +304,27 @@ public class Board extends JFrame implements ActionListener {
         if (playerCount ==2){
             if (currentIndex == 2){
             currentIndex = 0;
+            }
+                if(currentIndex ==1){
+                for (int i=0; i<4;i++){
+                    player3Cards[i].setEnabled(true);
+                    player1Cards[i].setEnabled(false);
+                }
+            }
+            if(currentIndex ==0){
+                for (int i=0; i<4;i++){
+                    player1Cards[i].setEnabled(true);
+                    player3Cards[i].setEnabled(false);
+                }
+            }
+        }
+        if (playerCount == 4){
 
-        }
-        }
-        else if (currentIndex == 4){
-            currentIndex = 0;
+            if (currentIndex == 4){
+                currentIndex = 0;
+            }
             
-        }
-        playerColor = playerColors[currentIndex];
-        turn = playerNames[currentIndex];
-        switchFrogs();
-        turnDisplay.setText("It's " + turn +"'s Turn ");
-        if(currentIndex ==1){
+            if(currentIndex ==1){
             for (int i=0; i<4;i++){
                 player2Cards[i].setEnabled(true);
                 player1Cards[i].setEnabled(false);
@@ -307,6 +348,20 @@ public class Board extends JFrame implements ActionListener {
                 player4Cards[i].setEnabled(false);
             }
         }
+            
+        }
+
+        if (playerCount ==4){
+            playerColor = playerColors[currentIndex];
+            System.out.println(playerColor);
+        }
+        else{
+            playerColor = playerColors2[currentIndex];
+        }
+        turn = playerNames[currentIndex];
+        switchFrogs();
+        turnDisplay.setText("It's " + turn +"'s Turn ");
+        
 
     }
 
@@ -401,7 +456,7 @@ public void actionPerformed(ActionEvent e) {
     }
 
 
-    if (src instanceof Leaf && selectedFrog != null && selectedFrog.getPlayerColor().equals(playerColor )) {
+    if (src instanceof Leaf && selectedFrog != null && selectedFrog.getPlayerColor().equals(playerColor)) {
         Leaf targetLeaf = (Leaf) src;
         if (selectedFrog.isOnLeaf()){
             if (!targetLeaf.isOccupied()) {
@@ -438,7 +493,8 @@ public void actionPerformed(ActionEvent e) {
         }
 
     else{
-        if (!targetLeaf.isOccupied() && (command.equals(baseLeaves[currentIndex]))) {
+        if(playerCount ==4){
+            if (!targetLeaf.isOccupied() && (command.equals(baseLeaves[currentIndex]))) {
             Leaf currentLeaf = null;
             for (Leaf leaf : leaves) {
                 int frogCenterX = selectedFrog.getX() + selectedFrog.getWidth() / 2;
@@ -471,6 +527,44 @@ public void actionPerformed(ActionEvent e) {
 
 
             }
+
+        }
+        else{
+            if (!targetLeaf.isOccupied() && (command.equals(baseLeaves2[currentIndex]))) {
+            Leaf currentLeaf = null;
+            for (Leaf leaf : leaves) {
+                int frogCenterX = selectedFrog.getX() + selectedFrog.getWidth() / 2;
+                int frogCenterY = selectedFrog.getY() + selectedFrog.getHeight() / 2;
+                if (Math.abs(frogCenterX - (leaf.getX() + leaf.getWidth() / 2)) < 40 &&
+                    Math.abs(frogCenterY - (leaf.getY() + leaf.getHeight() / 2)) < 40) {
+                    currentLeaf = leaf;
+                    break;
+                }
+            }
+
+
+                selectedFrog.moveFrog(
+                targetLeaf.getX() + targetLeaf.getWidth() / 2,
+                targetLeaf.getY() + targetLeaf.getHeight() / 2
+            );
+
+            targetLeaf.setOccupied();
+            selectedFrog.unHighlightFrog();
+            selectedFrog.setOnLeaf();
+
+            if (currentLeaf != null) {
+                currentLeaf.clearOccupied();
+                removeBridgeBetween(currentLeaf, targetLeaf);
+            }
+
+            selectedFrog = null;
+            parachuteMode = false;
+            turnSwitch();
+
+
+            }
+        }
+        
 
         }
     }
@@ -511,11 +605,13 @@ public void actionPerformed(ActionEvent e) {
         for(int i= 0; i<42;i++){
             if (removedHorBridges[i]!= null){
                 removedHorBridges[i].setVisible(false);
+                removedHorBridges[i].setEnabled(false);
             }
         }
         for(int i= 0; i<42;i++){
             if (removedVerBridges[i]!= null){
                 removedVerBridges[i].setVisible(false);
+                removedVerBridges[i].setEnabled(false);
             }
         }
         turnSwitch();
@@ -532,11 +628,13 @@ public void actionPerformed(ActionEvent e) {
         for(int i= 0; i<42;i++){
             if (removedVerBridges[i]!= null){
                 removedVerBridges[i].setVisible(false);
+                removedVerBridges[i].setEnabled(false);
             }
         }
         for(int i= 0; i<42;i++){
             if (removedHorBridges[i]!= null){
                 removedHorBridges[i].setVisible(false);
+                removedHorBridges[i].setEnabled(false);
             }
         }
         turnSwitch();

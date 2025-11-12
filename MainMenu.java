@@ -94,7 +94,6 @@ public class MainMenu extends JFrame implements ActionListener {
         }
         if (clicked.equals(twoPlayers)) {
                 int numberOfPlayers = 2;
-                System.out.println("2222");
                 Game demo = new Game(numberOfPlayers);
             // Add logic for 2 players
         } 
