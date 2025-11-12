@@ -70,6 +70,9 @@ public class Frog extends JButton {
     public void setOnLeaf(){
         onLeaf = true;
     }
+    public void setNotOnLeaf(){
+        onLeaf = false;
+    }
     public Boolean isOnLeaf(){
         return onLeaf;
     }

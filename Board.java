@@ -348,7 +348,6 @@ public void actionPerformed(ActionEvent e) {
                 }
             }
             if (hasBridgeBetween(currentLeaf, targetLeaf)){
-                System.out.println(selectedFrog.isOnLeaf());
                 selectedFrog.moveFrog(
                 targetLeaf.getX() + targetLeaf.getWidth() / 2,
                 targetLeaf.getY() + targetLeaf.getHeight() / 2
@@ -384,7 +383,6 @@ public void actionPerformed(ActionEvent e) {
             }
 
 
-                System.out.println(selectedFrog.isOnLeaf());
                 selectedFrog.moveFrog(
                 targetLeaf.getX() + targetLeaf.getWidth() / 2,
                 targetLeaf.getY() + targetLeaf.getHeight() / 2
@@ -406,12 +404,6 @@ public void actionPerformed(ActionEvent e) {
             }
 
         }
-        
-
-    
-
-
-
     }
 }
     
