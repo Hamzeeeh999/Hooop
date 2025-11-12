@@ -7,7 +7,7 @@ public class Board extends JFrame implements ActionListener {
 
     private JLayeredPane pane;
     private JLabel backgroundLabel, leafsLabel, baseLabel;
-    public String player1, player2, player3, player4, playerColor;
+    public String player1, player2, player3, player4, playerColor, playerTurn;
     private ImageIcon hooop, leafsBg,baseBg;
     private int leafCount = 1, playerCount;
     private String[] playerNames,playerColors = {"Blue", "Yellow","Red","Purple"}, baseLeaves = {"leaf 23","leaf 15","leaf 3","leaf 11"};
@@ -17,11 +17,15 @@ public class Board extends JFrame implements ActionListener {
     private JTextArea turnDisplay;
     private static String turn;
     private JButton[] blueFrogs, yellowFrogs, redFrogs, purpleFrogs;
+    private Bridge [] removedHorBridges, removedVerBridges;
     private Frog selectedFrog = null;
+    private ActionCard selectedCard= null;
     private java.util.List<Bridge> bridges = new java.util.ArrayList<>();
     private java.util.List<Leaf> leaves = new java.util.ArrayList<>();
     private boolean isHorizontal(JComponent c) { return c.getWidth() > c.getHeight(); }
     private boolean parachuteMode = false;
+    private ActionCard[] player1Cards, player2Cards, player3Cards, player4Cards;
+
 
     public Board(String[] players, int playerCount) {
 
@@ -47,10 +51,19 @@ public class Board extends JFrame implements ActionListener {
         turnDisplay.setOpaque(false);
         turnDisplay.setForeground(Color.WHITE);
 
+        removedHorBridges = new Bridge[42];
+        removedVerBridges = new Bridge[42];
         blueFrogs = new JButton[3];
         redFrogs = new JButton[3];
         yellowFrogs = new JButton[3];
         purpleFrogs = new JButton[3];
+
+
+        player1Cards = new ActionCard[4];
+        player2Cards = new ActionCard[4];
+        player3Cards = new ActionCard[4];
+        player4Cards = new ActionCard[4];
+        
 
         ImageIcon gameBg = new ImageIcon("./Assets/Main-Menu-5.jpg");
         
@@ -147,18 +160,30 @@ public class Board extends JFrame implements ActionListener {
                 frog.setActionCommand("purpleFrog" + i);
                 pane.add(frog, Integer.valueOf(5));
             }
-            
-            for(int j=0;j<2;j++){
-                for(int i=0;i<4;i++){
-                    ActionCard card = new ActionCard();
-                    card.setBounds(1412-975*j,565+99*i,72, 88);
+            for(int i=0;i<4;i++){
+                    ActionCard card = new ActionCard(playerNames[1]);
+                    card.setBounds(1412,565+99*i,72, 88);
                     pane.add(card, Integer.valueOf(5));
                     card.setFocusPainted(false);
                     card.addActionListener(this);
                     card.setActionCommand("ActionCard" + i);
+                    player2Cards[i]=card;
                     card.nextCard();
+                    card.setEnabled(false);
                 }
-            }
+            for(int i=0;i<4;i++){
+                    ActionCard card = new ActionCard(playerNames[3]);
+                    card.setBounds(1412-975,565+99*i,72, 88);
+                    pane.add(card, Integer.valueOf(5));
+                    card.setFocusPainted(false);
+                    card.addActionListener(this);
+                    card.setActionCommand("ActionCard" + i);
+                    player4Cards[i]=card;
+                    card.nextCard();
+                    card.setEnabled(false);
+                }
+            
+        
         }
 
         for (int i=0;i<3;i++) {
@@ -170,17 +195,27 @@ public class Board extends JFrame implements ActionListener {
             frog.setActionCommand("redFrog" + i);
             pane.add(frog, Integer.valueOf(5));
         }
-        for(int j=0;j<2;j++){
-            for(int i=0;i<4;i++){
-                ActionCard card = new ActionCard();
-                card.setBounds(592 + 82*i,980-958*j,72, 88);
+        for(int i=0;i<4;i++){
+                ActionCard card = new ActionCard(playerNames[0]);
+                card.setBounds(592 + 82*i,980,72, 88);
                 pane.add(card, Integer.valueOf(5));
                 card.setFocusPainted(false);
                 card.addActionListener(this);
                 card.setActionCommand("ActionCard" + i);
+                player1Cards[i]=card;
                 card.nextCard();
             }
-        }
+        for(int i=0;i<4;i++){
+                ActionCard card = new ActionCard(playerNames[2]);
+                card.setBounds(592 + 82*i,980-958,72, 88);
+                pane.add(card, Integer.valueOf(5));
+                card.setFocusPainted(false);
+                card.addActionListener(this);
+                card.setActionCommand("ActionCard" + i);
+                player3Cards[i]=card;
+                card.nextCard();
+                card.setEnabled(false);
+            }
 
         
         pane.add(backgroundLabel, Integer.valueOf(0));
@@ -248,10 +283,38 @@ public class Board extends JFrame implements ActionListener {
         turn = playerNames[currentIndex];
         switchFrogs();
         turnDisplay.setText("It's " + turn +"'s Turn ");
+        if(currentIndex ==1){
+            for (int i=0; i<4;i++){
+                player2Cards[i].setEnabled(true);
+                player1Cards[i].setEnabled(false);
+            }
+        }
+        if(currentIndex ==2){
+            for (int i=0; i<4;i++){
+                player3Cards[i].setEnabled(true);
+                player2Cards[i].setEnabled(false);
+            }
+        }
+        if(currentIndex ==3){
+            for (int i=0; i<4;i++){
+                player4Cards[i].setEnabled(true);
+                player3Cards[i].setEnabled(false);
+            }
+        }
+        if(currentIndex ==0){
+            for (int i=0; i<4;i++){
+                player1Cards[i].setEnabled(true);
+                player4Cards[i].setEnabled(false);
+            }
+        }
+
     }
 
     
     
+
+    int removedHorBridgesCounter;
+    int removedVerBridgesCounter;
 
     private void removeBridgeBetween(Leaf from, Leaf to) {
     int fx = cx(from), fy = cy(from);
@@ -269,12 +332,16 @@ public class Board extends JFrame implements ActionListener {
         if (isHorizontal(b)) {
             if (Math.abs(by - midY) <= TOL && Math.abs(bx - midX) <= TOL) {
                 b.setVisible(false);
+                removedHorBridges[removedHorBridgesCounter] =b;
+                removedHorBridgesCounter++;
                 b.setEnabled(false);
                 return;
             }
         } else {
             if (Math.abs(bx - midX) <= TOL && Math.abs(by - midY) <= TOL) {
                 b.setVisible(false);
+                removedVerBridges[removedVerBridgesCounter] =b;
+                removedVerBridgesCounter++;
                 b.setEnabled(false);
                 return;
             }
@@ -319,6 +386,7 @@ private boolean hasBridgeBetween(Leaf from, Leaf to) {
 public void actionPerformed(ActionEvent e) {
     Object src = e.getSource();
     String command = e.getActionCommand();
+
 
     if (src instanceof Frog) {
         if (selectedFrog == null) {
@@ -401,16 +469,86 @@ public void actionPerformed(ActionEvent e) {
             parachuteMode = false;
             turnSwitch();
 
+
             }
 
         }
     }
+
+    if (src instanceof ActionCard ){
+        selectedCard = (ActionCard) src;
+
+
+        if (selectedCard.getCardName() == "Extra Bridge" && selectedCard.getPlayerName().equals(turn) && removedHorBridgesCounter!= 0 || removedVerBridgesCounter!= 0){
+            for(int i= 0; i<removedHorBridgesCounter;i++){
+                if (removedHorBridges[i] != null){
+                    removedHorBridges[i].setEnabled(true);
+                    removedHorBridges[i].setIcon(new ImageIcon(""));
+                    removedHorBridges[i].setActionCommand("Removed Horizontal Bridge");
+                    removedHorBridges[i].setVisible(true);
+                }
+            }
+            for(int i= 0; i<removedVerBridgesCounter;i++){
+                if (removedVerBridges[i] != null) {
+                    removedVerBridges[i].setEnabled(true);
+                    removedVerBridges[i].setIcon(new ImageIcon(""));
+                    removedVerBridges[i].setActionCommand("Removed Vertical Bridge");
+                    removedVerBridges[i].setVisible(true);
+                }
+            }
+            }
+
+        }
+    if (command.equals("Removed Horizontal Bridge")){
+        ((Bridge)src).placeHorBridge();
+
+        for(int i= 0; i<42;i++){
+            if (((Bridge)src) == removedHorBridges[i]){
+                removedHorBridges[i] = null;
+                break;
+            }
+        }
+        for(int i= 0; i<42;i++){
+            if (removedHorBridges[i]!= null){
+                removedHorBridges[i].setVisible(false);
+            }
+        }
+        for(int i= 0; i<42;i++){
+            if (removedVerBridges[i]!= null){
+                removedVerBridges[i].setVisible(false);
+            }
+        }
+        turnSwitch();
+    }
+    else if (command.equals("Removed Vertical Bridge")){
+        ((Bridge)src).placeVerBridge();
+
+        for(int i= 0; i<42;i++){
+            if (((Bridge)src) == removedVerBridges[i]){
+                removedVerBridges[i] = null;
+                break;
+            }
+        }
+        for(int i= 0; i<42;i++){
+            if (removedVerBridges[i]!= null){
+                removedVerBridges[i].setVisible(false);
+            }
+        }
+        for(int i= 0; i<42;i++){
+            if (removedHorBridges[i]!= null){
+                removedHorBridges[i].setVisible(false);
+            }
+        }
+        turnSwitch();
+    }
+
 }
     
 
     public static void main(String[] args) {
         Board window = new Board(new String[]{"Hamzeh", "Zach", "Kiara","Sean"},4);
         window.setSize(1920,1080);
+        
 
 
 

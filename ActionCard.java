@@ -3,9 +3,9 @@ import javax.swing.*;
 public class ActionCard extends JButton{
 
     private static int counter = 0 ;
-    private String cardName = "Parachute";
+    private String cardName = "Parachute", playerName = "";
 
-    public ActionCard(){
+    public ActionCard(String playerName){
         super(new ImageIcon("./Assets/Jumping-Frog.png"));
         setOpaque(false);
         setContentAreaFilled(false);
@@ -13,6 +13,7 @@ public class ActionCard extends JButton{
         setFocusPainted(false);
         setBorder(null);
         //setEnabled(false);
+        this.playerName = playerName;
 
     }
     public void nextCard(){
@@ -52,6 +53,12 @@ public class ActionCard extends JButton{
     }   
     public String getCardName(){
         return cardName;
+    }
+    public String getPlayerName(){
+        return playerName;
+    }
+    public void playerTurn(){
+        this.setEnabled(true);
     }
 
 
