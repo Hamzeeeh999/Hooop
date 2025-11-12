@@ -3,7 +3,6 @@ import javax.swing.*;
 
 public class Leaf extends JButton implements ActionListener{
     private boolean occupied = false;
-
     public Leaf(){
         super(new ImageIcon("./Assets/Leaf.png"));
         setOpaque(false);
@@ -35,6 +34,8 @@ public class Leaf extends JButton implements ActionListener{
     public Boolean isOccupied(){
         return occupied;
     }
+
+
 
     @Override
     public void actionPerformed(ActionEvent e) {

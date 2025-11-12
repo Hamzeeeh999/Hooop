@@ -2,6 +2,8 @@ import javax.swing.*;
 
 public class Frog extends JButton {
     private String playerColor;
+    private Boolean onLeaf = false;
+
 
     Boolean highlighted = false;
     public Frog(String playerColor){
@@ -64,5 +66,11 @@ public class Frog extends JButton {
     }
     public String getPlayerColor(){
         return playerColor;
+    }
+    public void setOnLeaf(){
+        onLeaf = true;
+    }
+    public Boolean isOnLeaf(){
+        return onLeaf;
     }
 }

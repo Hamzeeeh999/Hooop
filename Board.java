@@ -10,7 +10,7 @@ public class Board extends JFrame implements ActionListener {
     public String player1, player2, player3, player4, playerColor;
     private ImageIcon hooop, leafsBg,baseBg;
     private int leafCount = 1, playerCount;
-    private String[] playerNames,playerColors = {"Blue", "Yellow","Red","Purple"};
+    private String[] playerNames,playerColors = {"Blue", "Yellow","Red","Purple"}, baseLeaves = {"leaf 23","leaf 15","leaf 3","leaf 11"};
     private JButton selectedButton = null;
     private Font fontStyle1, fontStyle2, fontStyle3;
     private static int currentIndex = 0;
@@ -281,11 +281,44 @@ public class Board extends JFrame implements ActionListener {
         }
     }
     
+    
+}
+private boolean hasBridgeBetween(Leaf from, Leaf to) {
+    int fx = cx(from), fy = cy(from);
+    int tx = cx(to),   ty = cy(to);
+
+    int midX = (fx + tx) / 2;
+    int midY = (fy + ty) / 2;
+
+    // Slightly increase tolerance based on your 173–170 grid spacing
+    final int TOL = 60;
+
+    for (Bridge b : bridges) {
+        if (!b.isVisible()) continue;
+
+        int bx = cx(b);
+        int by = cy(b);
+
+        if (isHorizontal(b)) {
+            // Bridges connect horizontally aligned leaves (same row)
+            if (Math.abs(fy - ty) < 60 && Math.abs(bx - midX) < TOL && Math.abs(by - midY) < TOL)
+                return true;
+        } else {
+            // Bridges connect vertically aligned leaves (same column)
+            if (Math.abs(fx - tx) < 60 && Math.abs(bx - midX) < TOL && Math.abs(by - midY) < TOL)
+                return true;
+        }
+    }
+
+    return false;
 }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
+
+
+@Override
+public void actionPerformed(ActionEvent e) {
     Object src = e.getSource();
+    String command = e.getActionCommand();
 
     if (src instanceof Frog) {
         if (selectedFrog == null) {
@@ -299,9 +332,11 @@ public class Board extends JFrame implements ActionListener {
         return;
     }
 
-    if (src instanceof Leaf && selectedFrog != null && selectedFrog.getPlayerColor().equals(playerColor)) {
+
+    if (src instanceof Leaf && selectedFrog != null && selectedFrog.getPlayerColor().equals(playerColor )) {
         Leaf targetLeaf = (Leaf) src;
-        if (!targetLeaf.isOccupied()) {
+        if (selectedFrog.isOnLeaf()){
+            if (!targetLeaf.isOccupied()) {
             Leaf currentLeaf = null;
             for (Leaf leaf : leaves) {
                 int frogCenterX = selectedFrog.getX() + selectedFrog.getWidth() / 2;
@@ -312,8 +347,9 @@ public class Board extends JFrame implements ActionListener {
                     break;
                 }
             }
-
-            selectedFrog.moveFrog(
+            if (hasBridgeBetween(currentLeaf, targetLeaf)){
+                System.out.println(selectedFrog.isOnLeaf());
+                selectedFrog.moveFrog(
                 targetLeaf.getX() + targetLeaf.getWidth() / 2,
                 targetLeaf.getY() + targetLeaf.getHeight() / 2
             );
@@ -330,10 +366,55 @@ public class Board extends JFrame implements ActionListener {
             parachuteMode = false;
             turnSwitch();
 
+            }
         }
+        }
+
+    else{
+        if (!targetLeaf.isOccupied() && (command.equals(baseLeaves[currentIndex]))) {
+            Leaf currentLeaf = null;
+            for (Leaf leaf : leaves) {
+                int frogCenterX = selectedFrog.getX() + selectedFrog.getWidth() / 2;
+                int frogCenterY = selectedFrog.getY() + selectedFrog.getHeight() / 2;
+                if (Math.abs(frogCenterX - (leaf.getX() + leaf.getWidth() / 2)) < 40 &&
+                    Math.abs(frogCenterY - (leaf.getY() + leaf.getHeight() / 2)) < 40) {
+                    currentLeaf = leaf;
+                    break;
+                }
+            }
+
+
+                System.out.println(selectedFrog.isOnLeaf());
+                selectedFrog.moveFrog(
+                targetLeaf.getX() + targetLeaf.getWidth() / 2,
+                targetLeaf.getY() + targetLeaf.getHeight() / 2
+            );
+
+            targetLeaf.setOccupied();
+            selectedFrog.unHighlightFrog();
+            selectedFrog.setOnLeaf();
+
+            if (currentLeaf != null) {
+                currentLeaf.clearOccupied();
+                removeBridgeBetween(currentLeaf, targetLeaf);
+            }
+
+            selectedFrog = null;
+            parachuteMode = false;
+            turnSwitch();
+
+            }
+
+        }
+        
+
+    
+
+
+
     }
 }
-
+    
 
     public static void main(String[] args) {
         Board window = new Board(new String[]{"Hamzeh", "Zach", "Kiara","Sean"},4);
