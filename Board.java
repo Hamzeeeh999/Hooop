@@ -11,7 +11,7 @@ public class Board extends JFrame implements ActionListener {
     private ImageIcon hooop, leafsBg,baseBg;
     private int leafCount = 1, playerCount;
     private String[] playerNames,playerColors = {"Blue", "Yellow","Red","Purple"},playerColors2 = {"Blue","Red"}, baseLeaves = {"leaf 23","leaf 15","leaf 3","leaf 11"}, baseLeaves2 = {"leaf 23","leaf 3"};
-    private JButton selectedButton = null;
+    private JButton selectedButton = null, MoveAFrog, PlaceABridge;
     private Font fontStyle1, fontStyle2, fontStyle3;
     private static int currentIndex = 0;
     private JTextArea turnDisplay;
@@ -25,12 +25,16 @@ public class Board extends JFrame implements ActionListener {
     private boolean isHorizontal(JComponent c) { return c.getWidth() > c.getHeight(); }
     private boolean parachuteMode = false;
     private ActionCard[] player1Cards, player2Cards, player3Cards, player4Cards;
-    public boolean extraJumpActivated = false;
+    public boolean extraJumpActivated = false, moveFrog = false, placeBridge= false;
+    private JFrame frame;
+    private JDialog dialog;
+    private JPanel popupPanel;
 
 
     public Board(String[] players, int playerCount) {
 
-        JFrame frame = new JFrame();
+        frame = new JFrame();
+        popupPanel = new JPanel();
         playerNames = new String[playerCount];
         playerNames = players;
         this.playerCount = playerCount;
@@ -61,6 +65,7 @@ public class Board extends JFrame implements ActionListener {
         player3Cards = new ActionCard[4];
         player4Cards = new ActionCard[4];
         
+        
 
         ImageIcon gameBg = new ImageIcon("./Assets/Main-Menu-5.jpg");
         
@@ -78,6 +83,7 @@ public class Board extends JFrame implements ActionListener {
             leafsBg = new ImageIcon("./Assets/Main-Menu-5-3.png");
         }
 
+        
         backgroundLabel = new ScaledImageLabel(gameBg.getImage());
         baseLabel = new ScaledImageLabel(baseBg.getImage());
         leafsLabel = new ScaledImageLabel(leafsBg.getImage());
@@ -198,6 +204,7 @@ public class Board extends JFrame implements ActionListener {
                 pane.add(card, Integer.valueOf(5));
                 card.setFocusPainted(false);
                 card.addActionListener(this);
+                card.setEnabled(true);
                 card.setActionCommand("ActionCard" + i);
                 player1Cards[i]=card;
                 card.nextCard();
@@ -247,6 +254,8 @@ public class Board extends JFrame implements ActionListener {
 		frame.setResizable(false);
 		frame.setVisible(true);
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        popup();
+        showPopUp();
     }
     private int cx(JComponent c) { 
         return c.getX() + c.getWidth()/2; 
@@ -351,10 +360,46 @@ public void switchFrogs() {
         }
         turn = playerNames[currentIndex];
         switchFrogs();
+        showPopUp();
         turnDisplay.setText("It's " + turn +"'s Turn ");
-        
+    }
+
+
+    public void popup(){
+        dialog = new JDialog(frame, "Popup", true);
+        dialog.setSize(300, 150);
+        dialog.setLocationRelativeTo(frame); 
+        dialog.setUndecorated(true);
+
+        MoveAFrog = new JButton("move a frog");
+        MoveAFrog.setActionCommand("Move a frog");
+        MoveAFrog.addActionListener(this);
+        //styleButton(MoveAFrog);
+        PlaceABridge = new JButton("place A Bridge");
+        PlaceABridge.addActionListener(this);
+        PlaceABridge.setActionCommand("Place a bridge");
+        //styleButton(PlaceABridge);
+        popupPanel.add(MoveAFrog);
+        popupPanel.add(PlaceABridge);
+        dialog.add(popupPanel);
+    }
+
+    public void showPopUp(){
+        dialog.setVisible(true);
 
     }
+    public void hidePopup(){
+        dialog.setVisible(false);
+    }
+    private void styleButton (JButton b){
+        b.setOpaque(false);
+        b.setContentAreaFilled(false);
+        b.setBorderPainted(false);
+        b.setFocusPainted(false);
+        b.setForeground(Color.WHITE);
+        b.addActionListener(this);
+    }
+    
 
     
     
@@ -424,6 +469,9 @@ private boolean hasBridgeBetween(Leaf from, Leaf to) {
     }
 
     return false;
+
+
+    
 }
 
 
@@ -434,7 +482,22 @@ public void actionPerformed(ActionEvent e) {
     String command = e.getActionCommand();
 
 
-    if (src instanceof Frog) {
+
+    if(command.equals("Move a frog")){
+        hidePopup();
+        moveFrog= true;
+    }
+    if(command.equals("Place a bridge") && removedBridges >=1){
+        hidePopup();
+        placeBridge= true;
+    }
+    if (removedBridges <1){
+        System.out.println("There's no bridges to be placed so you will have to move a frog");
+        moveFrog = true;
+        hidePopup();
+    }
+
+    if (src instanceof Frog && moveFrog) {
         if (selectedFrog == null) {
             selectedFrog = (Frog) src;
             selectedFrog.highlightFrog();
@@ -448,7 +511,7 @@ public void actionPerformed(ActionEvent e) {
 
 
     
-    if (src instanceof Leaf && selectedFrog != null && selectedFrog.getPlayerColor().equals(playerColor)) {
+    if (src instanceof Leaf && selectedFrog != null && selectedFrog.getPlayerColor().equals(playerColor) && moveFrog) {
         Leaf targetLeaf = (Leaf) src;
         if (selectedFrog.isOnLeaf()){
             if (!targetLeaf.isOccupied()) {
@@ -486,7 +549,7 @@ public void actionPerformed(ActionEvent e) {
 
     else{
         if(playerCount ==4){
-            if (!targetLeaf.isOccupied() && (command.equals(baseLeaves[currentIndex]))) {
+            if (!targetLeaf.isOccupied() && (command.equals(baseLeaves[currentIndex])) && moveFrog) {
             Leaf currentLeaf = null;
             for (Leaf leaf : leaves) {
                 int frogCenterX = selectedFrog.getX() + selectedFrog.getWidth() / 2;
@@ -522,7 +585,7 @@ public void actionPerformed(ActionEvent e) {
 
         }
         else{
-            if (!targetLeaf.isOccupied() && (command.equals(baseLeaves2[currentIndex]))) {
+            if (!targetLeaf.isOccupied() && (command.equals(baseLeaves2[currentIndex]))&& moveFrog) {
             Leaf currentLeaf = null;
             for (Leaf leaf : leaves) {
                 int frogCenterX = selectedFrog.getX() + selectedFrog.getWidth() / 2;
@@ -571,7 +634,7 @@ public void actionPerformed(ActionEvent e) {
         }
         
         // There was missing brackets so I added them, still works as intended.
-        if (selectedCard!= null && selectedCard.getCardName() == "Extra Bridge" && selectedCard.getPlayerName().equals(turn) && (removedHorBridgesCounter!= 0 || removedVerBridgesCounter!= 0)){
+        if (selectedCard!= null && selectedCard.getCardName() == "Extra Bridge" && selectedCard.getPlayerName().equals(turn) && (removedHorBridgesCounter>=2 || removedVerBridgesCounter >=2)){
             for(int i= 0; i<removedHorBridgesCounter;i++){
                 if (removedHorBridges[i] != null){
                     removedHorBridges[i].setEnabled(true);
@@ -660,6 +723,77 @@ public void actionPerformed(ActionEvent e) {
         }
         selectedCard.doneCard();
     }
+}
+
+if (command.equals("Place a bridge") && removedBridges >=1){
+    for(int i= 0; i<removedHorBridgesCounter;i++){
+                if (removedHorBridges[i] != null){
+                    removedHorBridges[i].setEnabled(true);
+                    removedHorBridges[i].setIcon(new ImageIcon(""));
+                    removedHorBridges[i].setActionCommand("Removed Hor Bridge");
+                    removedHorBridges[i].setVisible(true);
+                }
+            }
+    for(int i= 0; i<removedVerBridgesCounter;i++){
+                if (removedVerBridges[i] != null) {
+                    removedVerBridges[i].setEnabled(true);
+                    removedVerBridges[i].setIcon(new ImageIcon(""));
+                    removedVerBridges[i].setActionCommand("Removed Ver Bridge");
+                    removedVerBridges[i].setVisible(true);
+                }
+            }
+
+}
+if (command.equals("Removed Hor Bridge")){
+        ((Bridge)src).placeHorBridge();
+
+
+        for(int i= 0; i<42;i++){
+            if (((Bridge)src) == removedHorBridges[i]){
+                removedHorBridges[i] = null;
+                break;
+            }
+        }
+            for(int i= 0; i<42;i++){
+            if (removedHorBridges[i]!= null){
+                removedHorBridges[i].setVisible(false);
+                removedHorBridges[i].setEnabled(false);
+            }
+        }
+        for(int i= 0; i<42;i++){
+            if (removedVerBridges[i]!= null){
+                removedVerBridges[i].setVisible(false);
+                removedVerBridges[i].setEnabled(false);
+            }
+        }
+        turnSwitch();
+        hidePopup();
+    }
+    else if (command.equals("Removed Ver Bridge")){
+        ((Bridge)src).placeVerBridge();
+
+        for(int i= 0; i<42;i++){
+            if (((Bridge)src) == removedVerBridges[i]){
+                removedVerBridges[i] = null;
+                break;
+            }
+        }
+        
+        for(int i= 0; i<42;i++){
+            if (removedVerBridges[i]!= null){
+                removedVerBridges[i].setVisible(false);
+                removedVerBridges[i].setEnabled(false);
+            }
+        }
+        for(int i= 0; i<42;i++){
+            if (removedHorBridges[i]!= null){
+                removedHorBridges[i].setVisible(false);
+                removedHorBridges[i].setEnabled(false);
+            }
+        
+    }
+    turnSwitch();
+    hidePopup();
 }
 
 }
