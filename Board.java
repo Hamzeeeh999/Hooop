@@ -25,6 +25,7 @@ public class Board extends JFrame implements ActionListener {
     private boolean isHorizontal(JComponent c) { return c.getWidth() > c.getHeight(); }
     private boolean parachuteMode = false;
     private ActionCard[] player1Cards, player2Cards, player3Cards, player4Cards;
+    public boolean extraJumpActivated = false;
 
 
     public Board(String[] players, int playerCount) {
@@ -285,6 +286,13 @@ public void switchFrogs() {
 }
     public void turnSwitch() {
         currentIndex++;
+
+        // This checks if the extra jump card is activated and gives the current player two turns.
+        if (extraJumpActivated == true) {
+            currentIndex--;
+            extraJumpActivated = false;
+        }
+
         if (playerCount ==2){
             if (currentIndex == 2){
             currentIndex = 0;
@@ -556,13 +564,14 @@ public void actionPerformed(ActionEvent e) {
     if (src instanceof ActionCard ){
         selectedCard = (ActionCard) src;
 
-        if (removedBridges < 2){
+        // Changed this to work with the Extra Jump Card
+        if (removedBridges < 2 && selectedCard.getCardName() == "Extra Bridge"){
             System.out.println("There's not enough bridges to place");
             selectedCard = null;
         }
-
-
-        if (selectedCard!= null && selectedCard.getCardName() == "Extra Bridge" && selectedCard.getPlayerName().equals(turn) && removedHorBridgesCounter!= 0 || removedVerBridgesCounter!= 0){
+        
+        // There was missing brackets so I added them, still works as intended.
+        if (selectedCard!= null && selectedCard.getCardName() == "Extra Bridge" && selectedCard.getPlayerName().equals(turn) && (removedHorBridgesCounter!= 0 || removedVerBridgesCounter!= 0)){
             for(int i= 0; i<removedHorBridgesCounter;i++){
                 if (removedHorBridges[i] != null){
                     removedHorBridges[i].setEnabled(true);
@@ -579,7 +588,13 @@ public void actionPerformed(ActionEvent e) {
                     removedVerBridges[i].setVisible(true);
                 }
             }
-            }
+        }
+
+        //Variable "extraJumpActivated" allows the SwitchTurn function to give the player two turns. Implementation is not finished yet, still need to add some restrictions on each turn.
+        if (selectedCard!= null && selectedCard.getCardName() == "Extra Jump" && selectedCard.getPlayerName().equals(turn)){
+            extraJumpActivated = true;
+            selectedCard.doneCard();
+        }     
 
         }
     if (command.equals("Removed Horizontal Bridge")){

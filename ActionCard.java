@@ -12,7 +12,7 @@ public class ActionCard extends JButton{
         setBorderPainted(false);
         setFocusPainted(false);
         setBorder(null);
-        //setEnabled(false);
+        setEnabled(false);
         this.playerName = playerName;
 
     }
