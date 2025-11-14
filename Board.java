@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.util.HashMap;
 import javax.swing.*;
 
 public class Board extends JFrame implements ActionListener {
@@ -18,7 +19,7 @@ public class Board extends JFrame implements ActionListener {
     private static String turn;
     private JButton[] blueFrogs, yellowFrogs, redFrogs, purpleFrogs;
     private Bridge [] removedHorBridges, removedVerBridges;
-    private Frog selectedFrog = null;
+    private Frog selectedFrog = null, pushedFrog = null;
     private ActionCard selectedCard= null;
     private java.util.List<Bridge> bridges = new java.util.ArrayList<>();
     private java.util.List<Leaf> leaves = new java.util.ArrayList<>();
@@ -29,6 +30,8 @@ public class Board extends JFrame implements ActionListener {
     private JFrame frame;
     private JDialog dialog;
     private JPanel popupPanel;
+    private HashMap<Leaf, Frog> leafFrogMap = new HashMap<>();
+
 
 
     public Board(String[] players, int playerCount) {
@@ -293,7 +296,7 @@ public void switchFrogs() {
 
         
 }
-    public void turnSwitch() {
+public void turnSwitch() {
         currentIndex++;
 
         // This checks if the extra jump card is activated and gives the current player two turns.
@@ -365,7 +368,7 @@ public void switchFrogs() {
     }
 
 
-    public void popup(){
+public void popup(){
         dialog = new JDialog(frame, "Popup", true);
         dialog.setSize(300, 150);
         dialog.setLocationRelativeTo(frame); 
@@ -384,14 +387,14 @@ public void switchFrogs() {
         dialog.add(popupPanel);
     }
 
-    public void showPopUp(){
+public void showPopUp(){
         dialog.setVisible(true);
 
     }
-    public void hidePopup(){
+public void hidePopup(){
         dialog.setVisible(false);
     }
-    private void styleButton (JButton b){
+private void styleButton (JButton b){
         b.setOpaque(false);
         b.setContentAreaFilled(false);
         b.setBorderPainted(false);
@@ -404,11 +407,11 @@ public void switchFrogs() {
     
     
 
-    int removedHorBridgesCounter;
-    int removedVerBridgesCounter;
-    static int removedBridges;
+int removedHorBridgesCounter;
+int removedVerBridgesCounter;
+static int removedBridges;
 
-    private void removeBridgeBetween(Leaf from, Leaf to) {
+private void removeBridgeBetween(Leaf from, Leaf to) {
     int fx = cx(from), fy = cy(from);
     int tx = cx(to),   ty = cy(to);
 
@@ -536,10 +539,78 @@ private boolean isAdjacent(Leaf from, Leaf to) {
     return false;
 }
 
+private void firstMovement(Object src, Leaf targetLeaf){
+                selectedFrog.moveFrog(targetLeaf.getX() + targetLeaf.getWidth() / 2,targetLeaf.getY() + targetLeaf.getHeight() / 2);
+                leafFrogMap.put(targetLeaf, selectedFrog);
+                targetLeaf.setOccupied();
+                selectedFrog.unHighlightFrog();
+                selectedFrog.setOnLeaf();
+                selectedFrog = null;
+                parachuteMode = false;
+            }
+
+private void movement(Object src, Leaf targetLeaf){
+    Leaf currentLeaf = null;
+            for (Leaf leaf : leaves) {
+                int frogCenterX = selectedFrog.getX() + selectedFrog.getWidth() / 2;
+                int frogCenterY = selectedFrog.getY() + selectedFrog.getHeight() / 2;
+                if (Math.abs(frogCenterX - (leaf.getX() + leaf.getWidth() / 2)) < 40 &&
+                    Math.abs(frogCenterY - (leaf.getY() + leaf.getHeight() / 2)) < 40) {
+                    currentLeaf = leaf;
+                    leafFrogMap.put(currentLeaf, selectedFrog);
+                    break;
+                }
+            }
+            if (isAdjacent(currentLeaf, targetLeaf) && (hasBridgeBetween(currentLeaf, targetLeaf) || parachuteMode == true)){
+                selectedFrog.moveFrog(
+                targetLeaf.getX() + targetLeaf.getWidth() / 2,targetLeaf.getY() + targetLeaf.getHeight() / 2);
+                leafFrogMap.put(targetLeaf, selectedFrog);
+
+            targetLeaf.setOccupied();
+            selectedFrog.unHighlightFrog();
+
+            if (leafFrogMap.containsKey(currentLeaf)) {
+                leafFrogMap.keySet().remove(currentLeaf);
+                removeBridgeBetween(currentLeaf, targetLeaf);
+            }
+
+            selectedFrog = null;
+            parachuteMode = false;
+
+            }
+}
+Leaf previousLeaf = null;
+private void movePushed(Object src, Leaf targetLeaf, Leaf currentLeaf){
+            if (isAdjacent(currentLeaf, targetLeaf) && (hasBridgeBetween(currentLeaf, targetLeaf) || parachuteMode == true)){
+                selectedFrog.moveFrog(
+                targetLeaf.getX() + targetLeaf.getWidth() / 2,targetLeaf.getY() + targetLeaf.getHeight() / 2);
+                leafFrogMap.put(targetLeaf, selectedFrog);
+                turnSwitch();
+
+            targetLeaf.setOccupied();
+            selectedFrog.unHighlightFrog();
+
+
+            
+
+            selectedFrog = null;
+            parachuteMode = false;
+
+            }
+
+}
+private void pushFrog(Frog f){
+    f.setLocation(200,200);
+    pushedFrog =f;
+    f.setEnabled(true);
+    f.addActionListener(this);
+
+}
 int bridgesPlaces;
 @Override
 public void actionPerformed(ActionEvent e) {
     Object src = e.getSource();
+    Object src2 = e.getSource();
     String command = e.getActionCommand();
 
 
@@ -551,11 +622,20 @@ public void actionPerformed(ActionEvent e) {
     if(command.equals("Place a bridge") && removedBridges >=1){
         hidePopup();
         placeBridge= true;
-    }
-    if (removedBridges <1){
+        if (removedBridges <1){
         System.out.println("There's no bridges to be placed so you will have to move a frog");
         moveFrog = true;
         hidePopup();
+    }
+    }
+    if (src.equals(pushedFrog)){
+        selectedFrog = pushedFrog;
+        selectedFrog.setEnabled(true);
+    }
+    if (src instanceof Leaf && selectedFrog == pushedFrog){
+        Leaf targetLeaf = (Leaf) src;
+        movePushed(src, targetLeaf, previousLeaf);
+        pushedFrog = null;
     }
 
     if (src instanceof Frog && moveFrog) {
@@ -569,107 +649,57 @@ public void actionPerformed(ActionEvent e) {
         }
         return;
     }
- 
+    
+    //movement past the first time
     if (src instanceof Leaf && selectedFrog != null && selectedFrog.getPlayerColor().equals(playerColor) && moveFrog) {
         Leaf targetLeaf = (Leaf) src;
         if (selectedFrog.isOnLeaf()){
-            if (!targetLeaf.isOccupied()) {
-            Leaf currentLeaf = null;
-            for (Leaf leaf : leaves) {
-                int frogCenterX = selectedFrog.getX() + selectedFrog.getWidth() / 2;
-                int frogCenterY = selectedFrog.getY() + selectedFrog.getHeight() / 2;
-                if (Math.abs(frogCenterX - (leaf.getX() + leaf.getWidth() / 2)) < 40 &&
-                    Math.abs(frogCenterY - (leaf.getY() + leaf.getHeight() / 2)) < 40) {
-                    currentLeaf = leaf;
-                    break;
-                }
-            }
-            if (isAdjacent(currentLeaf, targetLeaf) && (hasBridgeBetween(currentLeaf, targetLeaf) || parachuteMode == true)){
-                selectedFrog.moveFrog(
-                targetLeaf.getX() + targetLeaf.getWidth() / 2,
-                targetLeaf.getY() + targetLeaf.getHeight() / 2
-            );
-
-            targetLeaf.setOccupied();
-            selectedFrog.unHighlightFrog();
-
-            if (currentLeaf != null) {
-                currentLeaf.clearOccupied();
-                removeBridgeBetween(currentLeaf, targetLeaf);
-            }
-
-            selectedFrog = null;
-            parachuteMode = false;
+            if (!leafFrogMap.containsKey(targetLeaf)) {
+            movement(src, targetLeaf);
             turnSwitch();
-
-            }
         }
+            else{
+                Frog f = leafFrogMap.get(targetLeaf);
+                pushFrog(f);
+                selectedFrog.setEnabled(false);
+                previousLeaf = targetLeaf;
+                movement(src, targetLeaf);
+                //previousLeaf.setVisible(false);
+            }
+        // here will be the push command
+        
+        
         }
 
     else{
         if(playerCount ==4){
-            if (!targetLeaf.isOccupied() && (command.equals(baseLeaves[currentIndex])) && moveFrog) {
-            Leaf currentLeaf = null;
-            for (Leaf leaf : leaves) {
-                int frogCenterX = selectedFrog.getX() + selectedFrog.getWidth() / 2;
-                int frogCenterY = selectedFrog.getY() + selectedFrog.getHeight() / 2;
-                if (Math.abs(frogCenterX - (leaf.getX() + leaf.getWidth() / 2)) < 40 &&
-                    Math.abs(frogCenterY - (leaf.getY() + leaf.getHeight() / 2)) < 40) {
-                    currentLeaf = leaf;
-                    break;
-                }
+            if (!leafFrogMap.containsKey(targetLeaf) && (command.equals(baseLeaves[currentIndex])) && moveFrog) {
+                firstMovement(src, targetLeaf);
+                turnSwitch();
             }
-
-
-                selectedFrog.moveFrog(
-                targetLeaf.getX() + targetLeaf.getWidth() / 2,
-                targetLeaf.getY() + targetLeaf.getHeight() / 2
-            );
-
-            targetLeaf.setOccupied();
-            selectedFrog.unHighlightFrog();
-            selectedFrog.setOnLeaf();
-
-            if (currentLeaf != null) {
-                currentLeaf.clearOccupied();
-                removeBridgeBetween(currentLeaf, targetLeaf);
-            }
-
-            selectedFrog = null;
-            parachuteMode = false;
-            turnSwitch();
-
-
-            }
+            // here will be the push command
+            if (leafFrogMap.containsKey(targetLeaf) && (command.equals(baseLeaves[currentIndex])) && moveFrog) {
+            Frog f = leafFrogMap.get(targetLeaf);
+                pushFrog(f);
+                selectedFrog.setEnabled(false);
+                previousLeaf = targetLeaf;
+                firstMovement(src, targetLeaf);
+            
+        }
+            
 
         }
         else{
-            if (!targetLeaf.isOccupied() && (command.equals(baseLeaves2[currentIndex]))&& moveFrog) {
-            Leaf currentLeaf = null;
-            for (Leaf leaf : leaves) {
-                int frogCenterX = selectedFrog.getX() + selectedFrog.getWidth() / 2;
-                int frogCenterY = selectedFrog.getY() + selectedFrog.getHeight() / 2;
-                if (Math.abs(frogCenterX - (leaf.getX() + leaf.getWidth() / 2)) < 40 &&
-                    Math.abs(frogCenterY - (leaf.getY() + leaf.getHeight() / 2)) < 40) {
-                    currentLeaf = leaf;
-                    break;
-                }
-            }
+            if (!leafFrogMap.containsKey(targetLeaf) && (command.equals(baseLeaves2[currentIndex]))&& moveFrog) {
 
 
-                selectedFrog.moveFrog(
-                targetLeaf.getX() + targetLeaf.getWidth() / 2,
-                targetLeaf.getY() + targetLeaf.getHeight() / 2
-            );
+
+                selectedFrog.moveFrog(targetLeaf.getX() + targetLeaf.getWidth() / 2,targetLeaf.getY() + targetLeaf.getHeight() / 2);
+                leafFrogMap.put(targetLeaf, selectedFrog);
 
             targetLeaf.setOccupied();
             selectedFrog.unHighlightFrog();
             selectedFrog.setOnLeaf();
-
-            if (currentLeaf != null) {
-                currentLeaf.clearOccupied();
-                removeBridgeBetween(currentLeaf, targetLeaf);
-            }
 
             selectedFrog = null;
             parachuteMode = false;
@@ -677,6 +707,15 @@ public void actionPerformed(ActionEvent e) {
 
 
             }
+            // here will be the push command
+            else{
+            Frog f = leafFrogMap.get(targetLeaf);
+                pushFrog(f);
+                selectedFrog.setEnabled(false);
+                previousLeaf = targetLeaf;
+                movement(src, targetLeaf);
+            
+        }
         }
         
 
@@ -864,7 +903,7 @@ if (command.equals("Removed Hor Bridge")){
 }
     
 
-    public static void main(String[] args) {
+public static void main(String[] args) {
         Board window = new Board(new String[]{"Hamzeh", "Zach", "Kiara","Sean"},4);
         window.setSize(1920,1080);
         
