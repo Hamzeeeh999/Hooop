@@ -471,17 +471,16 @@ private boolean hasBridgeBetween(Leaf from, Leaf to) {
     return false;  
 }
 
-private boolean isSmallestGapInRow(int rowY, int gap) {
+private boolean isSmallestGapInRow(int y, int gap) {
     int smallest = Integer.MAX_VALUE;
 
     for (Leaf leaf : leaves) {
         int ly = cy(leaf);
 
-        // This leaf is in the same row
-        if (Math.abs(ly - rowY) < 20) {
+        if (Math.abs(ly - y) < 20) {
             for (Leaf other : leaves) {
                 if (leaf == other) continue;
-                if (Math.abs(cy(other) - rowY) < 20) {
+                if (Math.abs(cy(other) - y) < 20) {
                     int dx = Math.abs(cx(leaf) - cx(other));
                     if (dx > 0 && dx < smallest)
                         smallest = dx;
@@ -493,17 +492,16 @@ private boolean isSmallestGapInRow(int rowY, int gap) {
     return Math.abs(gap - smallest) < 20;
 }
 
-private boolean isSmallestGapInColumn(int colX, int gap) {
+private boolean isSmallestGapInColumn(int x, int gap) {
     int smallest = Integer.MAX_VALUE;
 
     for (Leaf leaf : leaves) {
         int lx = cx(leaf);
 
-        // This leaf is in the same column
-        if (Math.abs(lx - colX) < 20) {
+        if (Math.abs(lx - x) < 20) {
             for (Leaf other : leaves) {
                 if (leaf == other) continue;
-                if (Math.abs(cx(other) - colX) < 20) {
+                if (Math.abs(cx(other) - x) < 20) {
                     int dy = Math.abs(cy(leaf) - cy(other));
                     if (dy > 0 && dy < smallest)
                         smallest = dy;
