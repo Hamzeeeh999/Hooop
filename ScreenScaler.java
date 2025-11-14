@@ -71,6 +71,17 @@ public class ScreenScaler {
                     btn.setIcon(new ImageIcon(scaledImg));
                 }
             }
+            // Scale disabled icon as well
+Icon disIcon = btn.getDisabledIcon();
+if (disIcon instanceof ImageIcon disImgIcon) {
+    int w2 = btn.getWidth();
+    int h2 = btn.getHeight();
+    if (w2 > 0 && h2 > 0) {
+        Image scaledDisImg = disImgIcon.getImage().getScaledInstance(w2, h2, Image.SCALE_SMOOTH);
+        btn.setDisabledIcon(new ImageIcon(scaledDisImg));
+    }
+}
+
         }
 
         // Special handling for JTextField, JTextArea, JComboBox (keep your existing logic)
@@ -110,7 +121,7 @@ public class ScreenScaler {
         }
     }
 
-    private static void scaleFont(Component comp, double scale) {
+private static void scaleFont(Component comp, double scale) {
         Font f = comp.getFont();
         if (f != null) {
             float newSize = (float) (f.getSize2D() * scale*1.05);
@@ -123,4 +134,58 @@ public class ScreenScaler {
             }
         }
     }
+    public static void scalePopupGlass(JComponent popup) {
+    if (popup == null) return;
+
+    Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+
+    double scaleX = screen.getWidth()  / BASE_RESOLUTION.getWidth();
+    double scaleY = screen.getHeight() / BASE_RESOLUTION.getHeight();
+    double scale  = Math.min(scaleX, scaleY); // keep aspect
+
+    // Scale all child components (buttons, labels, etc.)
+    for (Component c : popup.getComponents()) {
+        int newX = (int) (c.getX() * scale);
+        int newY = (int) (c.getY() * scale);
+        int newW = (int) (c.getWidth() * scale);
+        int newH = (int) (c.getHeight() * scale);
+
+        c.setBounds(newX, newY, newW, newH);
+
+        // Scale font
+        Font f = c.getFont();
+        if (f != null) {
+            float newSize = (float) (f.getSize2D() * scale);
+            c.setFont(f.deriveFont(newSize));
+        }
+
+        // Scale icons (if any)
+        if (c instanceof JLabel lbl) {
+            Icon ic = lbl.getIcon();
+            if (ic instanceof ImageIcon imgIc && newW > 0 && newH > 0) {
+                Image scaled = imgIc.getImage()
+                        .getScaledInstance(newW, newH, Image.SCALE_SMOOTH);
+                lbl.setIcon(new ImageIcon(scaled));
+            }
+        } else if (c instanceof JButton btn) {
+            Icon ic = btn.getIcon();
+            if (ic instanceof ImageIcon imgIc && newW > 0 && newH > 0) {
+                Image scaled = imgIc.getImage()
+                        .getScaledInstance(newW, newH, Image.SCALE_SMOOTH);
+                btn.setIcon(new ImageIcon(scaled));
+            }
+
+            Icon dis = btn.getDisabledIcon();
+            if (dis instanceof ImageIcon disIc && newW > 0 && newH > 0) {
+                Image scaledDis = disIc.getImage()
+                        .getScaledInstance(newW, newH, Image.SCALE_SMOOTH);
+                btn.setDisabledIcon(new ImageIcon(scaledDis));
+            }
+        }
+    }
+
+    popup.revalidate();
+    popup.repaint();
+}
+
 }

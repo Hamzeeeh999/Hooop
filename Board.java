@@ -24,7 +24,7 @@ public class Board extends JFrame implements ActionListener {
     private java.util.List<Bridge> bridges = new java.util.ArrayList<>();
     private java.util.List<Leaf> leaves = new java.util.ArrayList<>();
     private boolean isHorizontal(JComponent c) { return c.getWidth() > c.getHeight(); }
-    private boolean parachuteMode = false;
+    private boolean parachuteMode = false, moved = false;
     private ActionCard[] player1Cards, player2Cards, player3Cards, player4Cards;
     public boolean extraJumpActivated = false, moveFrog = false, placeBridge= false;
     private JFrame frame;
@@ -397,6 +397,10 @@ public void turnSwitch() {
             playerColor = playerColors2[currentIndex];
         }
         turn = playerNames[currentIndex];
+        moveFrog = false;
+        placeBridge = false;
+        moved = false;
+
         switchFrogs();
         showPopUp();
         turnDisplay.setText("It's " + turn +"'s Turn ");
@@ -436,7 +440,20 @@ private void styleButton (JButton b){
         b.addActionListener(this);
     }
 
-    
+private void disableAllFrogs() {
+    for (int i = 0; i<3;i++){
+        blueFrogs[i].setEnabled(false);
+    }
+    for (int i = 0; i<3;i++){
+        yellowFrogs[i].setEnabled(false);
+    }
+    for (int i = 0; i<3;i++){
+        redFrogs[i].setEnabled(false);
+    }
+    for (int i = 0; i<3;i++){
+        purpleFrogs[i].setEnabled(false);
+    }
+} 
     
 
 int removedHorBridgesCounter;
@@ -597,6 +614,7 @@ private void movement(Object src, Leaf targetLeaf){
                 selectedFrog.moveFrog(
                 targetLeaf.getX() + targetLeaf.getWidth() / 2,targetLeaf.getY() + targetLeaf.getHeight() / 2);
                 leafFrogMap.put(targetLeaf, selectedFrog);
+                moved = true;
 
             targetLeaf.setOccupied();
             selectedFrog.unHighlightFrog();
@@ -656,11 +674,11 @@ public void actionPerformed(ActionEvent e) {
     if(command.equals("Place a bridge") && removedBridges >=1){
         hidePopup();
         placeBridge= true;
-        if (removedBridges <1){
+    }
+    if (command.equals("Place a bridge") && removedBridges <1){
         System.out.println("There's no bridges to be placed so you will have to move a frog");
         moveFrog = true;
         hidePopup();
-    }
     }
     if (src.equals(pushedFrog)){
         selectedFrog = pushedFrog;
@@ -690,7 +708,13 @@ public void actionPerformed(ActionEvent e) {
         if (selectedFrog.isOnLeaf()){
             if (!leafFrogMap.containsKey(targetLeaf)) {
             movement(src, targetLeaf);
-            turnSwitch();
+            if (moved){
+                turnSwitch();
+            }
+            else{
+                System.out.println("Please select a leaf that has bridge!");
+                movement(src, targetLeaf);
+            }
         }
             else{
                 Frog f = leafFrogMap.get(targetLeaf);
@@ -840,7 +864,7 @@ if (src instanceof ActionCard ){
     }
 }
 
-if (command.equals("Place a bridge") && removedBridges >=1){
+if (command.equals("Place a bridge") && placeBridge){
     for(int i= 0; i<removedHorBridgesCounter;i++){
                 if (removedHorBridges[i] != null){
                     removedHorBridges[i].setEnabled(true);
@@ -884,8 +908,8 @@ if (command.equals("Removed Hor Bridge")){
                 removedVerBridges[i].setEnabled(false);
             }
         }
-        turnSwitch();
         hidePopup();
+        turnSwitch();
     }
     else if (command.equals("Removed Ver Bridge")){
         ((Bridge)src).placeVerBridge();
@@ -910,8 +934,8 @@ if (command.equals("Removed Hor Bridge")){
             }
         
     }
-    turnSwitch();
     hidePopup();
+    turnSwitch();
 }
 
 }
