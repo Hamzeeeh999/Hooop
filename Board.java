@@ -6,13 +6,13 @@ import javax.swing.*;
 public class Board extends JFrame implements ActionListener {
 
 
-    private JLayeredPane pane;
-    private JLabel backgroundLabel, leafsLabel, baseLabel;
+    private JLayeredPane pane,popupPanel;
+    private JLabel backgroundLabel, leafsLabel, baseLabel, popupLabel;
     public String player1, player2, player3, player4, playerColor, playerTurn;
-    private ImageIcon hooop, leafsBg,baseBg;
+    private ImageIcon hooop, leafsBg,baseBg,popup;
     private int leafCount = 1, playerCount;
     private String[] playerNames,playerColors = {"Blue", "Yellow","Red","Purple"},playerColors2 = {"Blue","Red"}, baseLeaves = {"leaf 23","leaf 15","leaf 3","leaf 11"}, baseLeaves2 = {"leaf 23","leaf 3"};
-    private JButton selectedButton = null, MoveAFrog, PlaceABridge;
+    private JButton selectedButton = null, MoveAFrog, PlaceABridge,popupButton;
     private Font fontStyle1, fontStyle2, fontStyle3;
     private static int currentIndex = 0;
     private JTextArea turnDisplay;
@@ -28,23 +28,34 @@ public class Board extends JFrame implements ActionListener {
     private ActionCard[] player1Cards, player2Cards, player3Cards, player4Cards;
     public boolean extraJumpActivated = false, moveFrog = false, placeBridge= false;
     private JFrame frame;
-    private JDialog dialog;
-    private JPanel popupPanel;
     private HashMap<Leaf, Frog> leafFrogMap = new HashMap<>();
+    private JPanel popupOverlay;
+
 
 
 
     public Board(String[] players, int playerCount) {
 
         frame = new JFrame();
-        popupPanel = new JPanel();
+        popupPanel = new JLayeredPane() {
+        @Override
+        protected void paintComponent(Graphics g) {
+        }};
+        popupPanel.setOpaque(false);
+        
+        popupPanel.setLayout(null);
+        popupPanel.setBounds(0, 0, 200, 200);
+        popup = new ImageIcon("./Assets/Popup.png");
+        popupLabel = new ScaledImageLabel(popup.getImage());
+        popupLabel.setOpaque(false);
+        popupLabel.setBounds(0,0,420,90);
         playerNames = new String[playerCount];
         playerNames = players;
         this.playerCount = playerCount;
         turn = players[0];
         playerColor = playerColors[currentIndex];
 
-        fontStyle1 = FontLoader.load("./Assets/Whipsnapper W05 Black.ttf",40f);
+        fontStyle1 = FontLoader.load("./Assets/Whipsnapper W05 Black.ttf",25f);
         fontStyle2 = FontLoader.load("./Assets/Whipsnapper W05 Black.ttf",52f);
         fontStyle3 = FontLoader.load("./Assets/Whipsnapper W05 Black.ttf", 86f);
 
@@ -67,9 +78,32 @@ public class Board extends JFrame implements ActionListener {
         player2Cards = new ActionCard[4];
         player3Cards = new ActionCard[4];
         player4Cards = new ActionCard[4];
-        
-        
 
+
+        popupOverlay = new JPanel(null) {
+    @Override
+    protected void paintComponent(Graphics g) {
+        // Draw popup background (PNG with transparency)
+        g.drawImage(popup.getImage(), 750, 495, null);
+    }
+};
+
+// allow mouse events (default GlassPane blocks them)
+popupOverlay.setOpaque(false);
+popupOverlay.setVisible(false);
+popupOverlay.setPreferredSize(new Dimension(
+    popup.getIconWidth(),
+    popup.getIconHeight()
+));
+
+// IMPORTANT: enable mouse input
+popupOverlay.setEnabled(true);
+popupOverlay.setFocusable(true);
+
+frame.setGlassPane(popupOverlay);
+
+        
+        
         ImageIcon gameBg = new ImageIcon("./Assets/Main-Menu-5.jpg");
         
         if(playerCount==2){
@@ -99,6 +133,7 @@ public class Board extends JFrame implements ActionListener {
         backgroundLabel.setBounds(0, 0, 1920, 1080);
         baseLabel.setBounds(2, 3, 1920, 1080);
         leafsLabel.setBounds(10,10,1920, 1080);
+        
         // for loop to add all the leafs in their desired position (once everything is implements we can enable the setBorderPainted to false )
 
         for(int i=0;i<5;i++) {
@@ -243,7 +278,7 @@ public class Board extends JFrame implements ActionListener {
 
         
         pane.add(backgroundLabel, Integer.valueOf(0));
-        pane.add(turnDisplay, Integer.valueOf(7));
+        //pane.add(turnDisplay, Integer.valueOf(7));
         pane.add(baseLabel, Integer.valueOf(1));
         pane.add(leafsLabel, Integer.valueOf(6));
         frame.add(pane);
@@ -367,32 +402,30 @@ public void turnSwitch() {
         turnDisplay.setText("It's " + turn +"'s Turn ");
     }
 
+public void popup() {
+    MoveAFrog = new JButton("Move a frog");
+    PlaceABridge = new JButton("Place a bridge");
 
-public void popup(){
-        dialog = new JDialog(frame, "Popup", true);
-        dialog.setSize(300, 150);
-        dialog.setLocationRelativeTo(frame); 
-        dialog.setUndecorated(true);
+    styleButton(MoveAFrog);
+    styleButton(PlaceABridge);
+    MoveAFrog.setFont(fontStyle1);
+    PlaceABridge.setFont(fontStyle1);
 
-        MoveAFrog = new JButton("move a frog");
-        MoveAFrog.setActionCommand("Move a frog");
-        MoveAFrog.addActionListener(this);
-        //styleButton(MoveAFrog);
-        PlaceABridge = new JButton("place A Bridge");
-        PlaceABridge.addActionListener(this);
-        PlaceABridge.setActionCommand("Place a bridge");
-        //styleButton(PlaceABridge);
-        popupPanel.add(MoveAFrog);
-        popupPanel.add(PlaceABridge);
-        dialog.add(popupPanel);
-    }
+    MoveAFrog.setBounds(770, 515, 185, 50);
+    PlaceABridge.setBounds(963, 515, 185, 50);
+
+    popupOverlay.add(MoveAFrog);
+    popupOverlay.add(PlaceABridge);
+}
+
 
 public void showPopUp(){
-        dialog.setVisible(true);
+        popupOverlay.setVisible(true);
+    popupOverlay.requestFocusInWindow();
 
     }
 public void hidePopup(){
-        dialog.setVisible(false);
+        popupOverlay.setVisible(false);
     }
 private void styleButton (JButton b){
         b.setOpaque(false);
