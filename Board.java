@@ -468,12 +468,75 @@ private boolean hasBridgeBetween(Leaf from, Leaf to) {
         }
     }
 
-    return false;
-
-
-    
+    return false;  
 }
 
+private boolean isSmallestGapInRow(int rowY, int gap) {
+    int smallest = Integer.MAX_VALUE;
+
+    for (Leaf leaf : leaves) {
+        int ly = cy(leaf);
+
+        // This leaf is in the same row
+        if (Math.abs(ly - rowY) < 20) {
+            for (Leaf other : leaves) {
+                if (leaf == other) continue;
+                if (Math.abs(cy(other) - rowY) < 20) {
+                    int dx = Math.abs(cx(leaf) - cx(other));
+                    if (dx > 0 && dx < smallest)
+                        smallest = dx;
+                }
+            }
+        }
+    }
+
+    return Math.abs(gap - smallest) < 20;
+}
+
+private boolean isSmallestGapInColumn(int colX, int gap) {
+    int smallest = Integer.MAX_VALUE;
+
+    for (Leaf leaf : leaves) {
+        int lx = cx(leaf);
+
+        // This leaf is in the same column
+        if (Math.abs(lx - colX) < 20) {
+            for (Leaf other : leaves) {
+                if (leaf == other) continue;
+                if (Math.abs(cx(other) - colX) < 20) {
+                    int dy = Math.abs(cy(leaf) - cy(other));
+                    if (dy > 0 && dy < smallest)
+                        smallest = dy;
+                }
+            }
+        }
+    }
+
+    return Math.abs(gap - smallest) < 20;
+}
+
+private boolean isAdjacent(Leaf from, Leaf to) {
+    int fx = cx(from), fy = cy(from);
+    int tx = cx(to),   ty = cy(to);
+
+    final int ALIGN_TOL = 20;
+
+    if (Math.abs(fy - ty) < ALIGN_TOL) {              
+        int dx = Math.abs(fx - tx);
+        if (dx > 0) {
+            return isSmallestGapInRow(fy, dx);
+        }
+    }
+
+    if (Math.abs(fx - tx) < ALIGN_TOL) {              
+        int dy = Math.abs(fy - ty);
+        if (dy > 0) {
+            return isSmallestGapInColumn(fx, dy);
+        }
+    }
+
+    return false;
+}
 
 int bridgesPlaces;
 @Override
@@ -508,9 +571,7 @@ public void actionPerformed(ActionEvent e) {
         }
         return;
     }
-
-
-    
+ 
     if (src instanceof Leaf && selectedFrog != null && selectedFrog.getPlayerColor().equals(playerColor) && moveFrog) {
         Leaf targetLeaf = (Leaf) src;
         if (selectedFrog.isOnLeaf()){
@@ -525,7 +586,7 @@ public void actionPerformed(ActionEvent e) {
                     break;
                 }
             }
-            if (hasBridgeBetween(currentLeaf, targetLeaf)){
+            if (isAdjacent(currentLeaf, targetLeaf) && (hasBridgeBetween(currentLeaf, targetLeaf) || parachuteMode == true)){
                 selectedFrog.moveFrog(
                 targetLeaf.getX() + targetLeaf.getWidth() / 2,
                 targetLeaf.getY() + targetLeaf.getHeight() / 2
@@ -626,6 +687,12 @@ public void actionPerformed(ActionEvent e) {
 
     if (src instanceof ActionCard ){
         selectedCard = (ActionCard) src;
+        
+        // Allows a frog to jump to any adjacent leaf with or without a bridge
+        if (selectedCard != null && selectedCard.getCardName() == "Parachute" && selectedCard.getPlayerName().equals(turn)){
+            parachuteMode = true;
+            selectedCard.doneCard();
+        }
 
         // Changed this to work with the Extra Jump Card
         if (removedBridges < 2 && selectedCard.getCardName() == "Extra Bridge"){
