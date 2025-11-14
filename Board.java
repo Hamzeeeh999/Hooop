@@ -402,7 +402,6 @@ private void styleButton (JButton b){
         b.setForeground(Color.WHITE);
         b.addActionListener(this);
     }
-    
 
     
     
@@ -585,10 +584,12 @@ private void movePushed(Object src, Leaf targetLeaf, Leaf currentLeaf){
                 selectedFrog.moveFrog(
                 targetLeaf.getX() + targetLeaf.getWidth() / 2,targetLeaf.getY() + targetLeaf.getHeight() / 2);
                 leafFrogMap.put(targetLeaf, selectedFrog);
+                removeBridgeBetween(currentLeaf, targetLeaf);
                 turnSwitch();
 
             targetLeaf.setOccupied();
             selectedFrog.unHighlightFrog();
+            
 
 
             
@@ -664,11 +665,7 @@ public void actionPerformed(ActionEvent e) {
                 selectedFrog.setEnabled(false);
                 previousLeaf = targetLeaf;
                 movement(src, targetLeaf);
-                //previousLeaf.setVisible(false);
             }
-        // here will be the push command
-        
-        
         }
 
     else{
@@ -677,52 +674,32 @@ public void actionPerformed(ActionEvent e) {
                 firstMovement(src, targetLeaf);
                 turnSwitch();
             }
-            // here will be the push command
             if (leafFrogMap.containsKey(targetLeaf) && (command.equals(baseLeaves[currentIndex])) && moveFrog) {
             Frog f = leafFrogMap.get(targetLeaf);
                 pushFrog(f);
                 selectedFrog.setEnabled(false);
                 previousLeaf = targetLeaf;
                 firstMovement(src, targetLeaf);
-            
         }
-            
+        }
 
-        }
         else{
             if (!leafFrogMap.containsKey(targetLeaf) && (command.equals(baseLeaves2[currentIndex]))&& moveFrog) {
-
-
-
-                selectedFrog.moveFrog(targetLeaf.getX() + targetLeaf.getWidth() / 2,targetLeaf.getY() + targetLeaf.getHeight() / 2);
-                leafFrogMap.put(targetLeaf, selectedFrog);
-
-            targetLeaf.setOccupied();
-            selectedFrog.unHighlightFrog();
-            selectedFrog.setOnLeaf();
-
-            selectedFrog = null;
-            parachuteMode = false;
-            turnSwitch();
-
-
+                firstMovement(src, targetLeaf);
+                turnSwitch();
             }
-            // here will be the push command
             else{
             Frog f = leafFrogMap.get(targetLeaf);
                 pushFrog(f);
                 selectedFrog.setEnabled(false);
                 previousLeaf = targetLeaf;
-                movement(src, targetLeaf);
-            
+                firstMovement(src, targetLeaf);
         }
-        }
-        
-
         }
     }
+}
 
-    if (src instanceof ActionCard ){
+if (src instanceof ActionCard ){
         selectedCard = (ActionCard) src;
         
         // Allows a frog to jump to any adjacent leaf with or without a bridge
@@ -755,6 +732,7 @@ public void actionPerformed(ActionEvent e) {
                     removedVerBridges[i].setVisible(true);
                 }
             }
+            removedBridges--;
         }
 
         //Variable "extraJumpActivated" allows the SwitchTurn function to give the player two turns. Implementation is not finished yet, still need to add some restrictions on each turn.
@@ -836,6 +814,7 @@ if (command.equals("Place a bridge") && removedBridges >=1){
                     removedHorBridges[i].setIcon(new ImageIcon(""));
                     removedHorBridges[i].setActionCommand("Removed Hor Bridge");
                     removedHorBridges[i].setVisible(true);
+                    removedBridges--;
                 }
             }
     for(int i= 0; i<removedVerBridgesCounter;i++){
@@ -846,10 +825,12 @@ if (command.equals("Place a bridge") && removedBridges >=1){
                     removedVerBridges[i].setVisible(true);
                 }
             }
+            removedBridges--;
 
 }
 if (command.equals("Removed Hor Bridge")){
         ((Bridge)src).placeHorBridge();
+        removedBridges--;
 
 
         for(int i= 0; i<42;i++){
@@ -901,6 +882,7 @@ if (command.equals("Removed Hor Bridge")){
 }
 
 }
+
     
 
 public static void main(String[] args) {
