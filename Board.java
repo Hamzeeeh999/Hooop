@@ -678,6 +678,7 @@ public void actionPerformed(ActionEvent e) {
     if (command.equals("Place a bridge") && removedBridges <1){
         System.out.println("There's no bridges to be placed so you will have to move a frog");
         moveFrog = true;
+        placeBridge = false;
         hidePopup();
     }
     if (src.equals(pushedFrog)){
@@ -789,7 +790,6 @@ if (src instanceof ActionCard ){
                     removedVerBridges[i].setVisible(true);
                 }
             }
-            removedBridges--;
         }
 
         //Variable "extraJumpActivated" allows the SwitchTurn function to give the player two turns. Implementation is not finished yet, still need to add some restrictions on each turn.
@@ -802,6 +802,7 @@ if (src instanceof ActionCard ){
     if (command.equals("Removed Horizontal Bridge")){
         ((Bridge)src).placeHorBridge();
         bridgesPlaces++;
+        removedBridges--;
 
 
         for(int i= 0; i<42;i++){
@@ -835,6 +836,7 @@ if (src instanceof ActionCard ){
     else if (command.equals("Removed Vertical Bridge")){
         ((Bridge)src).placeVerBridge();
         bridgesPlaces++;
+        removedBridges--;
 
         for(int i= 0; i<42;i++){
             if (((Bridge)src) == removedVerBridges[i]){
@@ -871,7 +873,6 @@ if (command.equals("Place a bridge") && placeBridge){
                     removedHorBridges[i].setIcon(new ImageIcon(""));
                     removedHorBridges[i].setActionCommand("Removed Hor Bridge");
                     removedHorBridges[i].setVisible(true);
-                    removedBridges--;
                 }
             }
     for(int i= 0; i<removedVerBridgesCounter;i++){
@@ -882,7 +883,6 @@ if (command.equals("Place a bridge") && placeBridge){
                     removedVerBridges[i].setVisible(true);
                 }
             }
-            removedBridges--;
 
 }
 if (command.equals("Removed Hor Bridge")){
@@ -932,10 +932,15 @@ if (command.equals("Removed Hor Bridge")){
                 removedHorBridges[i].setVisible(false);
                 removedHorBridges[i].setEnabled(false);
             }
+            
         
     }
+    removedBridges--;
     hidePopup();
     turnSwitch();
+}
+if (selectedCard.getCardName() == "Bridge Removal"){
+    System.out.println(removedBridges);
 }
 
 }
