@@ -10,7 +10,7 @@ public class Bridge extends JButton{
         //setBorderPainted(false);
         //setFocusPainted(false);
         //setBorder(null);
-        //setEnabled(false);
+        setEnabled(false);
         setDisabledIcon(new ImageIcon("./Assets/bridge-hor.jpg"));
 
     } 
