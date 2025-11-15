@@ -26,7 +26,7 @@ public class Board extends JFrame implements ActionListener {
     private boolean isHorizontal(JComponent c) { return c.getWidth() > c.getHeight(); }
     private boolean parachuteMode = false, moved = false;
     private ActionCard[] player1Cards, player2Cards, player3Cards, player4Cards;
-    public boolean extraJumpActivated = false, moveFrog = false, placeBridge= false;
+    public boolean extraJumpActivated = false, moveFrog = false, placeBridge= false, secondMove= false;
     private JFrame frame;
     private HashMap<Leaf, Frog> leafFrogMap = new HashMap<>();
     private JPanel popupOverlay;
@@ -335,10 +335,10 @@ public void turnSwitch() {
         currentIndex++;
 
         // This checks if the extra jump card is activated and gives the current player two turns.
-        if (extraJumpActivated == true) {
+        /*if (extraJumpActivated == true) {
             currentIndex--;
             extraJumpActivated = false;
-        }
+        }*/
 
         if (playerCount ==2){
             if (currentIndex == 2){
@@ -400,6 +400,8 @@ public void turnSwitch() {
         moveFrog = false;
         placeBridge = false;
         moved = false;
+        extraJumpActivated = false;
+        secondMove = false;
 
         switchFrogs();
         showPopUp();
@@ -615,6 +617,7 @@ private void movement(Object src, Leaf targetLeaf){
                 targetLeaf.getX() + targetLeaf.getWidth() / 2,targetLeaf.getY() + targetLeaf.getHeight() / 2);
                 leafFrogMap.put(targetLeaf, selectedFrog);
                 moved = true;
+                secondMove = false;
 
             targetLeaf.setOccupied();
             selectedFrog.unHighlightFrog();
@@ -704,7 +707,7 @@ public void actionPerformed(ActionEvent e) {
     }
     
     //movement past the first time
-    if (src instanceof Leaf && selectedFrog != null && selectedFrog.getPlayerColor().equals(playerColor) && moveFrog) {
+    if (src instanceof Leaf && selectedFrog != null && selectedFrog.getPlayerColor().equals(playerColor) && moveFrog && !extraJumpActivated) {
         Leaf targetLeaf = (Leaf) src;
         if (selectedFrog.isOnLeaf()){
             if (!leafFrogMap.containsKey(targetLeaf)) {
@@ -771,6 +774,16 @@ if (src instanceof ActionCard ){
             System.out.println("There's not enough bridges to place");
             selectedCard = null;
         }
+
+        if (selectedCard!= null && selectedCard.getCardName() == "Extra Jump" && selectedCard.getPlayerName().equals(turn)){
+            extraJumpActivated = true;
+}
+if (selectedCard.getCardName() == "Parachute"){
+    System.out.println(extraJumpActivated);
+    System.out.println(moved);
+    System.out.println(secondMove);
+
+}
         
         // There was missing brackets so I added them, still works as intended.
         if (selectedCard!= null && selectedCard.getCardName() == "Extra Bridge" && selectedCard.getPlayerName().equals(turn) && (removedHorBridgesCounter>=2 || removedVerBridgesCounter >=2)){
@@ -793,12 +806,7 @@ if (src instanceof ActionCard ){
         }
 
         //Variable "extraJumpActivated" allows the SwitchTurn function to give the player two turns. Implementation is not finished yet, still need to add some restrictions on each turn.
-        if (selectedCard!= null && selectedCard.getCardName() == "Extra Jump" && selectedCard.getPlayerName().equals(turn)){
-            extraJumpActivated = true;
-            selectedCard.doneCard();
-        }     
 
-        }
     if (command.equals("Removed Horizontal Bridge")){
         ((Bridge)src).placeHorBridge();
         bridgesPlaces++;
@@ -939,13 +947,54 @@ if (command.equals("Removed Hor Bridge")){
     hidePopup();
     turnSwitch();
 }
-if (selectedCard.getCardName() == "Bridge Removal"){
-    System.out.println(removedBridges);
 }
 
-}
+if (extraJumpActivated){
+     if (src instanceof Leaf && selectedFrog != null && selectedFrog.getPlayerColor().equals(playerColor) && moveFrog) {
+            Leaf targetLeaf = (Leaf) src;
+            if (selectedFrog.isOnLeaf()){
+                if (!leafFrogMap.containsKey(targetLeaf)) {
+                movement(src, targetLeaf);
+                System.out.println(secondMove);
+                System.out.println(extraJumpActivated);
+                System.out.println(moved);
+                    if (moved){
+                        secondMove = false;
+                    }
+                else{
+                    System.out.println("Please select a leaf that has bridge!");
+                    movement(src, targetLeaf);
+                }
+        }     
 
+        }
     
+    }
+}
+if (extraJumpActivated && !secondMove){
+if (src instanceof Leaf && selectedFrog != null && extraJumpActivated && !secondMove) {
+     if (src instanceof Leaf && selectedFrog != null && selectedFrog.getPlayerColor().equals(playerColor) && moveFrog) {
+            Leaf targetLeaf = (Leaf) src;
+            if (selectedFrog.isOnLeaf()){
+                if (!leafFrogMap.containsKey(targetLeaf)) {
+                movement(src, targetLeaf);
+                System.out.println(secondMove);
+                    if (secondMove){
+                        turnSwitch();
+                        selectedCard.doneCard();
+                    }
+                else{
+                    System.out.println("Please select a leaf that has bridge!");
+                    movement(src, targetLeaf);
+                }
+        }     
+
+        }
+    }
+    }
+}
+}
+
 
 public static void main(String[] args) {
         Board window = new Board(new String[]{"Hamzeh", "Zach", "Kiara","Sean"},4);
