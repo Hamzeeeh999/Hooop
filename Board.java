@@ -933,7 +933,6 @@ if (command.equals("Removed Hor Bridge")){
         }
         placeBridge = false;
         turnSwitch();
-        hidePopup();
     }
     else if (command.equals("Removed Ver Bridge")){
         ((Bridge)src).placeVerBridge();
@@ -960,7 +959,6 @@ if (command.equals("Removed Hor Bridge")){
     }
     placeBridge = false;
     turnSwitch();
-    hidePopup();
 }
 
 }
