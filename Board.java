@@ -333,13 +333,11 @@ public void switchFrogs() {
 }
 public void turnSwitch() {
         currentIndex++;
-        PlaceABridge.setEnabled(true);
 
         // This checks if the extra jump card is activated and gives the current player two turns.
         if (extraJumpActivated == true) {
             currentIndex--;
             extraJumpActivated = false;
-            PlaceABridge.setEnabled(false);
         }
 
         if (playerCount ==2){
@@ -670,26 +668,6 @@ public void actionPerformed(ActionEvent e) {
     String command = e.getActionCommand();
     
     if(command.equals("Move a frog")){
-        for (ActionCard specificCard: player1Cards) {
-            if (specificCard.getCardName() == "Extra Jump" && currentIndex == 0) {
-                specificCard.setEnabled(true);
-            }   
-        }
-        for (ActionCard specificCard: player2Cards) {
-            if (specificCard.getCardName() == "Extra Jump" && currentIndex == 1) {
-                specificCard.setEnabled(true);
-            }   
-        }
-        for (ActionCard specificCard: player3Cards) {
-            if (specificCard.getCardName() == "Extra Jump" && currentIndex == 2) {
-                specificCard.setEnabled(true);
-            }   
-        }
-        for (ActionCard specificCard: player4Cards) {
-            if (specificCard.getCardName() == "Extra Jump" && currentIndex == 3) {
-                specificCard.setEnabled(true);
-            }   
-        }
         hidePopup();
         moveFrog= true;
     }
