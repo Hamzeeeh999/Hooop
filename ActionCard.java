@@ -21,6 +21,7 @@ public class ActionCard extends JButton{
         if(counter==2){
             setSecondCard();
             cardName = "Extra Jump";
+            this.setActionCommand("Extra Jump");
         }
         else if(counter==3){
             setThirdCard();
@@ -46,6 +47,8 @@ public class ActionCard extends JButton{
     }
     public void doneCard(){
         this.setIcon(new ImageIcon("./Assets/Hooop!.png"));
+        this.setDisabledIcon(new ImageIcon("./Assets/Hooop!.png"));
+        this.setEnabled(false);
     }
 
     public int getCounter(){
