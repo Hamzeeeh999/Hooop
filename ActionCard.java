@@ -47,6 +47,8 @@ public class ActionCard extends JButton{
     }
     public void doneCard(){
         this.setIcon(new ImageIcon("./Assets/Hooop!.png"));
+        this.setDisabledIcon(new ImageIcon("./Assets/Hooop!.png"));
+        this.setEnabled(false);
     }
 
     public int getCounter(){

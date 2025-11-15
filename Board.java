@@ -335,10 +335,10 @@ public void turnSwitch() {
         currentIndex++;
 
         // This checks if the extra jump card is activated and gives the current player two turns.
-        /*if (extraJumpActivated == true) {
+        if (extraJumpActivated == true) {
             currentIndex--;
             extraJumpActivated = false;
-        }*/
+        }
 
         if (playerCount ==2){
             if (currentIndex == 2){
@@ -617,7 +617,6 @@ private void movement(Object src, Leaf targetLeaf){
                 targetLeaf.getX() + targetLeaf.getWidth() / 2,targetLeaf.getY() + targetLeaf.getHeight() / 2);
                 leafFrogMap.put(targetLeaf, selectedFrog);
                 moved = true;
-                secondMove = false;
 
             targetLeaf.setOccupied();
             selectedFrog.unHighlightFrog();
@@ -667,9 +666,7 @@ public void actionPerformed(ActionEvent e) {
     Object src = e.getSource();
     Object src2 = e.getSource();
     String command = e.getActionCommand();
-
-
-
+    
     if(command.equals("Move a frog")){
         hidePopup();
         moveFrog= true;
@@ -759,6 +756,29 @@ public void actionPerformed(ActionEvent e) {
         }
     }
 }
+if (extraJumpActivated){
+     if (src instanceof Leaf && selectedFrog != null && selectedFrog.getPlayerColor().equals(playerColor) && moveFrog) {
+            Leaf targetLeaf = (Leaf) src;
+            if (selectedFrog.isOnLeaf()){
+                if (!leafFrogMap.containsKey(targetLeaf)) {
+                movement(src, targetLeaf);
+                    if (moved){
+                        turnSwitch();
+                        hidePopup();
+                        moveFrog = true;
+                }
+                else{
+                    System.out.println("Please select a leaf that has bridge!");
+                    movement(src, targetLeaf);
+                }
+                selectedCard.doneCard();
+        }     
+
+        }
+    
+    }
+}
+
 
 if (src instanceof ActionCard ){
         selectedCard = (ActionCard) src;
@@ -778,12 +798,10 @@ if (src instanceof ActionCard ){
         if (selectedCard!= null && selectedCard.getCardName() == "Extra Jump" && selectedCard.getPlayerName().equals(turn)){
             extraJumpActivated = true;
 }
-if (selectedCard.getCardName() == "Parachute"){
-    System.out.println(extraJumpActivated);
-    System.out.println(moved);
-    System.out.println(secondMove);
+    if (selectedCard.getCardName() == "Parachute"){
+        System.out.println(removedBridges);
 
-}
+    }
         
         // There was missing brackets so I added them, still works as intended.
         if (selectedCard!= null && selectedCard.getCardName() == "Extra Bridge" && selectedCard.getPlayerName().equals(turn) && (removedHorBridgesCounter>=2 || removedVerBridgesCounter >=2)){
@@ -874,7 +892,7 @@ if (selectedCard.getCardName() == "Parachute"){
     }
 }
 
-if (command.equals("Place a bridge") && placeBridge){
+if (command.equals("Place a bridge") && removedBridges>=1){
     for(int i= 0; i<removedHorBridgesCounter;i++){
                 if (removedHorBridges[i] != null){
                     removedHorBridges[i].setEnabled(true);
@@ -893,7 +911,7 @@ if (command.equals("Place a bridge") && placeBridge){
             }
 
 }
-if (command.equals("Removed Hor Bridge")){
+    if (command.equals("Removed Hor Bridge")){
         ((Bridge)src).placeHorBridge();
         removedBridges--;
 
@@ -949,50 +967,6 @@ if (command.equals("Removed Hor Bridge")){
 }
 }
 
-if (extraJumpActivated){
-     if (src instanceof Leaf && selectedFrog != null && selectedFrog.getPlayerColor().equals(playerColor) && moveFrog) {
-            Leaf targetLeaf = (Leaf) src;
-            if (selectedFrog.isOnLeaf()){
-                if (!leafFrogMap.containsKey(targetLeaf)) {
-                movement(src, targetLeaf);
-                System.out.println(secondMove);
-                System.out.println(extraJumpActivated);
-                System.out.println(moved);
-                    if (moved){
-                        secondMove = false;
-                    }
-                else{
-                    System.out.println("Please select a leaf that has bridge!");
-                    movement(src, targetLeaf);
-                }
-        }     
-
-        }
-    
-    }
-}
-if (extraJumpActivated && !secondMove){
-if (src instanceof Leaf && selectedFrog != null && extraJumpActivated && !secondMove) {
-     if (src instanceof Leaf && selectedFrog != null && selectedFrog.getPlayerColor().equals(playerColor) && moveFrog) {
-            Leaf targetLeaf = (Leaf) src;
-            if (selectedFrog.isOnLeaf()){
-                if (!leafFrogMap.containsKey(targetLeaf)) {
-                movement(src, targetLeaf);
-                System.out.println(secondMove);
-                    if (secondMove){
-                        turnSwitch();
-                        selectedCard.doneCard();
-                    }
-                else{
-                    System.out.println("Please select a leaf that has bridge!");
-                    movement(src, targetLeaf);
-                }
-        }     
-
-        }
-    }
-    }
-}
 }
 
 
