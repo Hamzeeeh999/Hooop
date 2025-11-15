@@ -333,11 +333,13 @@ public void switchFrogs() {
 }
 public void turnSwitch() {
         currentIndex++;
+        PlaceABridge.setEnabled(true);
 
         // This checks if the extra jump card is activated and gives the current player two turns.
         if (extraJumpActivated == true) {
             currentIndex--;
             extraJumpActivated = false;
+            PlaceABridge.setEnabled(false);
         }
 
         if (playerCount ==2){
@@ -650,6 +652,26 @@ public void actionPerformed(ActionEvent e) {
 
 
     if(command.equals("Move a frog")){
+        for (ActionCard specificCard: player1Cards) {
+            if (specificCard.getCardName() == "Extra Jump" && currentIndex == 0) {
+                specificCard.setEnabled(true);
+            }   
+        }
+        for (ActionCard specificCard: player2Cards) {
+            if (specificCard.getCardName() == "Extra Jump" && currentIndex == 1) {
+                specificCard.setEnabled(true);
+            }   
+        }
+        for (ActionCard specificCard: player3Cards) {
+            if (specificCard.getCardName() == "Extra Jump" && currentIndex == 2) {
+                specificCard.setEnabled(true);
+            }   
+        }
+        for (ActionCard specificCard: player4Cards) {
+            if (specificCard.getCardName() == "Extra Jump" && currentIndex == 3) {
+                specificCard.setEnabled(true);
+            }   
+        }
         hidePopup();
         moveFrog= true;
     }
@@ -770,8 +792,13 @@ if (src instanceof ActionCard ){
 
         //Variable "extraJumpActivated" allows the SwitchTurn function to give the player two turns. Implementation is not finished yet, still need to add some restrictions on each turn.
         if (selectedCard!= null && selectedCard.getCardName() == "Extra Jump" && selectedCard.getPlayerName().equals(turn)){
-            extraJumpActivated = true;
-            selectedCard.doneCard();
+            if (placeBridge == true) {
+                return;
+            }
+            else {
+                extraJumpActivated = true;
+                selectedCard.doneCard();
+            }
         }     
 
         }
@@ -841,6 +868,26 @@ if (src instanceof ActionCard ){
 }
 
 if (command.equals("Place a bridge") && removedBridges >=1){
+        for (ActionCard specificCard: player1Cards) {
+            if (specificCard.getCardName() == "Extra Jump" && currentIndex == 0) {
+                specificCard.setEnabled(false);
+            }   
+        }
+        for (ActionCard specificCard: player2Cards) {
+            if (specificCard.getCardName() == "Extra Jump" && currentIndex == 1) {
+                specificCard.setEnabled(false);
+            }   
+        }
+        for (ActionCard specificCard: player3Cards) {
+            if (specificCard.getCardName() == "Extra Jump" && currentIndex == 2) {
+                specificCard.setEnabled(false);
+            }   
+        }
+        for (ActionCard specificCard: player4Cards) {
+            if (specificCard.getCardName() == "Extra Jump" && currentIndex == 3) {
+                specificCard.setEnabled(false);
+            }   
+        }
     for(int i= 0; i<removedHorBridgesCounter;i++){
                 if (removedHorBridges[i] != null){
                     removedHorBridges[i].setEnabled(true);
@@ -884,6 +931,7 @@ if (command.equals("Removed Hor Bridge")){
                 removedVerBridges[i].setEnabled(false);
             }
         }
+        placeBridge = false;
         turnSwitch();
         hidePopup();
     }
@@ -910,6 +958,7 @@ if (command.equals("Removed Hor Bridge")){
             }
         
     }
+    placeBridge = false;
     turnSwitch();
     hidePopup();
 }
